@@ -40,6 +40,16 @@ Example output:
 	L6   Undefined variable: $foo
 	L12  Tried instantiating non-existant class: Nonexistant
 
+### Notes
+
+This tool makes some very heavy assumptions about how you're using it and your application.
+
+First of all, your project **must** use Composer's autoloader for every class and function being defined in the project.
+
+Second, the checker works best if all the files being checked are classes with methods, nothing more.
+
+Third, the `phint` command **must** be ran from the project root for the autoloader to be picked up. If the autoloader isn't picked up, the checker can't reliably verify that other classes being referenced actually exist.
+
 ## Contributing
 
 See the [CONTRIBUTING.md](CONTRIBUTING.md) file for information on contributing.
