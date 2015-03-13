@@ -28,7 +28,7 @@ class UseVisitor extends AbstractNodeVisitor implements NodeVisitorInterface
 
 	private function classExists($className)
 	{
-		if (PHP_VERSION_ID > 54000) {
+		if (PHP_VERSION_ID >= 50400) {
 			return class_exists($className)
 				|| interface_exists($className)
 				|| trait_exists($className);
