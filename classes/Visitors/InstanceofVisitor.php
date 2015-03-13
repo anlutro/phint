@@ -25,7 +25,7 @@ class InstanceofVisitor extends AbstractNodeVisitor implements NodeVisitorInterf
 			}
 		}
 
-		if (isset($className)) {
+		if (isset($className) && $className !== 'static' && $className !== 'self') {
 			$className = $this->getContext()
 				->getClassName($className);
 			if (!$this->classExists($className)) {
