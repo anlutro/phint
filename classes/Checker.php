@@ -55,6 +55,7 @@ class Checker
 		$this->addVisitor('Phint\Visitors\WhileVisitor');
 		$this->addVisitor('Phint\Visitors\ForVisitor');
 		$this->addVisitor('Phint\Visitors\ForeachVisitor');
+		$this->addVisitor('Phint\Visitors\TryCatchVisitor');
 		$this->addVisitor('Phint\Visitors\InstanceofVisitor');
 	}
 
