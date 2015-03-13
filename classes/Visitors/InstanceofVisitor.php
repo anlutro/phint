@@ -38,6 +38,7 @@ class InstanceofVisitor extends AbstractNodeVisitor implements NodeVisitorInterf
 
 	private function createClassNotFoundError($className, Instanceof_ $node)
 	{
+		$className = ltrim($className, '\\');
 		$msg = "Testing instanceof against non-existant class: $className";
 		return new Error($msg, $node);
 	}

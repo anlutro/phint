@@ -31,6 +31,7 @@ class NewVisitor extends AbstractNodeVisitor implements NodeVisitorInterface
 
 	private function createClassNotFoundError($className, New_ $node)
 	{
+		$className = ltrim($className, '\\');
 		$msg = "Tried instantiating non-existant class: $className";
 		return new Error($msg, $node);
 	}
