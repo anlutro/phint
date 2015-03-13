@@ -32,14 +32,42 @@ class ConsoleRunner
 
 	private function getPaths(array $inputs)
 	{
+		$dirs = [];
 		$paths = [];
+		$excludes = [];
+
+		foreach ($inputs as $key => $input) {
+			if (strpos($input, '--exclude=') === 0) {
+				$excludes[] = substr($input, 10);
+				unset($inputs[$key]);
+			}
+		}
 
 		foreach ($inputs as $input) {
 			if (is_dir($input)) {
-				$files = $this->findFiles($input);
-				$paths = array_merge($paths, $files);
+				$dirs[] = $input;
 			} else {
 				$paths[] = $input;
+			}
+		}
+
+		if ($dirs) {
+			$finder = Finder::create()
+				->files()
+				->name('*.php')
+				->in($dirs);
+
+			foreach ($finder as $file) {
+				$paths[] = $file->getPathName();
+			}
+		}
+
+		foreach ($paths as $key => $value) {
+			foreach ($excludes as $exclude) {
+				if (strpos($value, $exclude) === 0) {
+					unset($paths[$key]);
+					continue 2;
+				}
 			}
 		}
 
