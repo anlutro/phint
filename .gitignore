@@ -1,0 +1,6 @@
+/archive
+/tests/classes/Sandbox.php
+/tmp
+/vendor
+composer.lock
+*.phar

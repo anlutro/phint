@@ -1,0 +1,26 @@
+{
+	"name": "anlutro/phint",
+	"license": "GPL-3.0+",
+	"authors": [
+		{
+			"name": "Andreas Lutro",
+			"email": "anlutro@gmail.com"
+		}
+	],
+	"autoload": {
+		"psr-4": {
+			"Phint\\": "classes/"
+		}
+	},
+	"autoload-dev": {
+		"classmap": [
+			"tests/classes",
+			"tests/functional/cases"
+		]
+	},
+	"bin": ["bin/phint"],
+	"require": {
+		"nikic/php-parser": "~1.1",
+		"symfony/finder": "~2.6"
+	}
+}

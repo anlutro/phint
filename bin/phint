@@ -1,0 +1,28 @@
+#!/usr/bin/env php
+<?php
+error_reporting(E_ALL);
+
+// AUTOLOADING START
+$paths = [
+	dirname(__DIR__).'/vendor/autoload.php',
+	getcwd().'/vendor/autoload.php',
+];
+
+foreach ($paths as $path) {
+	if (file_exists($path)) {
+		require_once $path;
+	}
+}
+// AUTOLOADING END
+
+if (count($argv) < 2) {
+	echo "Missing arguments! Must provide at least one file or directory.\n";
+	echo "phint file1.php [file2.php [file3.php]]\n";
+	echo "phint directory1 [directory2 [directory3]]\n";
+	exit(1);
+}
+
+$paths = array_slice($argv, 1);
+$runner = new Phint\Runners\ConsoleRunner();
+$result = $runner->run($paths);
+exit($result);

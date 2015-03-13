@@ -1,0 +1,55 @@
+#!/usr/bin/env php
+<?php
+use Symfony\Component\Finder\Finder;
+
+require dirname(__DIR__).'/vendor/autoload.php';
+
+function get_relative_path($realpath)
+{
+	return str_replace(dirname(__DIR__), '', $realpath);
+}
+
+if (file_exists('phint.phar')) {
+	unlink('phint.phar');
+}
+
+$phar = new Phar('phint.phar', 0);
+$phar->setSignatureAlgorithm(Phar::SHA1);
+$phar->startBuffering();
+
+// add library files
+$finder = Finder::create()
+	->files()
+	->ignoreVCS(true)
+	->name('*.php')
+	->in(dirname(__DIR__).'/classes');
+
+foreach ($finder as $file) {
+	echo "Adding {$file->getRealPath()}\n";
+	$phar->addFile($file->getRealPath(), get_relative_path($file->getRealPath()));
+}
+
+// add vendor files
+$finder = Finder::create()
+	->files()
+	->ignoreVCS(true)
+	->name('*.php')
+	->exclude('symfony/finder/Symfony/Component/Finder/Tests')
+	->in(dirname(__DIR__).'/vendor');
+
+foreach ($finder as $file) {
+	echo "Adding {$file->getRealPath()}\n";
+	$phar->addFile($file->getRealPath(), get_relative_path($file->getRealPath()));
+}
+
+// build the phar stub
+$stub = file_get_contents(__DIR__.'/phint');
+$autoloader = "Phar::mapPhar('phint.phar');
+require 'phar://phint.phar/vendor/autoload.php';\n";
+$startPos = strpos($stub, '// AUTOLOADING START');
+$endPos = strpos($stub, '// AUTOLOADING END');
+$stub = substr_replace($stub, $autoloader, $startPos, $endPos - $startPos);
+$stub .= "\n__HALT_COMPILER();\n";
+
+$phar->setStub($stub);
+$phar->stopBuffering();
