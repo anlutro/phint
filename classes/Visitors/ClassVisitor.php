@@ -20,6 +20,7 @@ class ClassVisitor extends AbstractNodeVisitor implements NodeVisitorInterface
 		$className = $ctx->getClassName($node->name);
 		$ctx->setReflectionClass(new ReflectionClass($className));
 		$ctx->setClassNode($node);
+		$ctx->setVariable('this', $node);
 
 		$this->recurse($node->stmts);
 	}
