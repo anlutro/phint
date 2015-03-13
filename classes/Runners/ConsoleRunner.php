@@ -46,8 +46,10 @@ class ConsoleRunner
 		foreach ($inputs as $input) {
 			if (is_dir($input)) {
 				$dirs[] = $input;
-			} else {
+			} elseif (file_exists($input)) {
 				$paths[] = $input;
+			} else {
+				throw new \InvalidArgumentException("Path does not exist: $input");
 			}
 		}
 
