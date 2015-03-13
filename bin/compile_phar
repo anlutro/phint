@@ -45,7 +45,9 @@ foreach ($finder as $file) {
 // build the phar stub
 $stub = file_get_contents(__DIR__.'/phint');
 $autoloader = "Phar::mapPhar('phint.phar');
-require 'phar://phint.phar/vendor/autoload.php';\n";
+require 'phar://phint.phar/vendor/autoload.php';
+\$autoload = getcwd().'/vendor/autoload.php';
+if (file_exists(\$autoload)) require_once \$autoload;\n";
 $startPos = strpos($stub, '// AUTOLOADING START');
 $endPos = strpos($stub, '// AUTOLOADING END');
 $stub = substr_replace($stub, $autoloader, $startPos, $endPos - $startPos);
