@@ -17,6 +17,11 @@ class MethodCallVisitor extends AbstractNodeVisitor implements NodeVisitorInterf
 		}
 
 		if ($node->var->name == 'this' && ! $node->var->var) {
+			// method name is dynamic (variables/string concatenation)
+			if (!is_string($node->name)) {
+				return;
+			}
+
 			$reflClass = $this->getContext()
 				->getReflectionClass();
 			if (!$reflClass->hasMethod($node->name)) {

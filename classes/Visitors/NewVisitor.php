@@ -18,9 +18,12 @@ class NewVisitor extends AbstractNodeVisitor implements NodeVisitorInterface
 
 		if ($node->class instanceof Name) {
 			$className = $node->class->toString();
+			if ($node->class->isFullyQualified()) {
+				$className = '\\'.$className;
+			}
 		}
-		
-		if (isset($className)) {
+
+		if (isset($className) && $className !== 'static' && $className !== 'self') {
 			$className = $this->getContext()
 				->getClassName($className);
 			if (!class_exists($className)) {

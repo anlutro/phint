@@ -26,7 +26,11 @@ class ClassMethodVisitor extends AbstractNodeVisitor implements NodeVisitorInter
 
 		foreach ($node->params as $param) {
 			if ($param->type instanceof Name) {
-				$className = $ctx->getClassName($param->type->toString());
+				$className = $param->type->toString();
+				if ($param->type->isFullyQualified()) {
+					$className = '\\'.$className;
+				}
+				$className = $ctx->getClassName($className);
 				if (!$this->classExists($className)) {
 					$this->addError($this->createClassNotFoundError(
 						$className, $node, $param
@@ -36,7 +40,9 @@ class ClassMethodVisitor extends AbstractNodeVisitor implements NodeVisitorInter
 			$ctx->setVariable($param->name, $param);
 		}
 
-		$this->recurse($node->stmts);
+		if (!$node->isAbstract()) {
+			$this->recurse($node->stmts);
+		}
 	}
 
 	private function classExists($className)

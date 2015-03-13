@@ -20,6 +20,9 @@ class InstanceofVisitor extends AbstractNodeVisitor implements NodeVisitorInterf
 
 		if ($node->class instanceof Name) {
 			$className = $node->class->toString();
+			if ($node->class->isFullyQualified()) {
+				$className = '\\'.$className;
+			}
 		}
 
 		if (isset($className)) {
