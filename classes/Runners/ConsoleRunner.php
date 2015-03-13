@@ -74,17 +74,6 @@ class ConsoleRunner
 		return array_unique($paths);
 	}
 
-	private function findFiles($dir)
-	{
-		$finder = new Finder;
-		$files = $finder
-			->files()
-			->name('*.php')
-			->in($dir);
-		$files = iterator_to_array($files);
-		return array_keys($files);
-	}
-
 	private function check($path)
 	{
 		$checker = $this->makeChecker();
