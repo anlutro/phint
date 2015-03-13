@@ -1,9 +1,9 @@
 # Phint
 
-	[![Build Status](https://travis-ci.org/anlutro/phint.png?branch=master)](https://travis-ci.org/anlutro/phint)
-	[![Latest Stable Version](https://poser.pugx.org/anlutro/phint/v/stable.svg)](https://github.com/anlutro/phint/releases)
-	![Latest Unstable Version](https://poser.pugx.org/anlutro/phint/v/unstable.svg)
-	![License](https://poser.pugx.org/anlutro/phint/license.svg)
+[![Build Status](https://travis-ci.org/anlutro/phint.png?branch=master)](https://travis-ci.org/anlutro/phint)
+[![Latest Stable Version](https://poser.pugx.org/anlutro/phint/v/stable.svg)](https://github.com/anlutro/phint/releases)
+![Latest Unstable Version](https://poser.pugx.org/anlutro/phint/v/unstable.svg)
+![License](https://poser.pugx.org/anlutro/phint/license.svg)
 
 Phint is a static code analysis tool for PHP. Very much a work in progress.
 
