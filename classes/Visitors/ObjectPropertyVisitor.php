@@ -17,6 +17,11 @@ class ObjectPropertyVisitor extends AbstractNodeVisitor implements NodeVisitorIn
 		}
 
 		if ($node->var->name == 'this' && ! $node->var->var) {
+			// property name is dynamic (variables/string concatenation)
+			if (!is_string($node->name)) {
+				return;
+			}
+
 			$reflClass = $this->getContext()
 				->getReflectionClass();
 			if (!$reflClass->hasProperty($node->name)) {
