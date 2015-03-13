@@ -5,6 +5,7 @@ use Phint\AbstractNodeVisitor;
 use Phint\NodeVisitorInterface;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Assign;
+use PhpParser\Node\Expr\AssignRef;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Expr\PropertyFetch;
 use PhpParser\Node\Expr\List_;
@@ -13,7 +14,7 @@ class AssignVisitor extends AbstractNodeVisitor implements NodeVisitorInterface
 {
 	public function visit(Node $node)
 	{
-		if (! $node instanceof Assign) {
+		if (! $node instanceof Assign && ! $node instanceof AssignRef) {
 			return;
 		}
 
