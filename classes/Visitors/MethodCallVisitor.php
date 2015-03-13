@@ -24,7 +24,10 @@ class MethodCallVisitor extends AbstractNodeVisitor implements NodeVisitorInterf
 
 			$reflClass = $this->getContext()
 				->getReflectionClass();
-			if (!$reflClass->hasMethod($node->name)) {
+			if (
+				! $reflClass->hasMethod($node->name) &&
+				! $reflClass->hasMethod('__call')
+			) {
 				$this->addError($this->createUndefinedMethodError($node, $reflClass));
 			}
 		} else {

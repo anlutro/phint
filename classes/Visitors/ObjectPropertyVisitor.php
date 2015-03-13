@@ -24,7 +24,10 @@ class ObjectPropertyVisitor extends AbstractNodeVisitor implements NodeVisitorIn
 
 			$reflClass = $this->getContext()
 				->getReflectionClass();
-			if (!$reflClass->hasProperty($node->name)) {
+			if (
+				! $reflClass->hasProperty($node->name) &&
+				! $reflClass->hasMethod('__get')
+			) {
 				$this->addError($this->createUndefinedPropertyError($node, $reflClass));
 			}
 		} else {

@@ -2,7 +2,9 @@
 namespace Phint\Visitors;
 
 use Phint\AbstractNodeVisitor;
+use Phint\Error;
 use Phint\NodeVisitorInterface;
+use ReflectionClass;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Assign;
 use PhpParser\Node\Expr\AssignRef;
@@ -19,7 +21,24 @@ class AssignVisitor extends AbstractNodeVisitor implements NodeVisitorInterface
 		}
 
 		if ($node->var instanceof PropertyFetch) {
-			$this->recurse($node->var);
+			if ($node->var->var->name == 'this' && ! $node->var->var->var) {
+				// property name is dynamic (variables/string concatenation)
+				if (!is_string($node->var->name)) {
+					return;
+				}
+
+				$reflClass = $this->getContext()
+					->getReflectionClass();
+				if (
+					! $reflClass->hasProperty($node->var->name) &&
+					! $reflClass->hasMethod('__set')
+				) {
+					$this->addError($this->createUndefinedPropertyError(
+						$node->var, $reflClass));
+				}
+			} else {
+				// TODO
+			}
 		}
 
 		$ctx = $this->getContext();
@@ -37,5 +56,13 @@ class AssignVisitor extends AbstractNodeVisitor implements NodeVisitorInterface
 		if ($node->var instanceof Variable) {
 			$ctx->setVariable($node->var->name, $node->expr);
 		}
+	}
+
+	private function createUndefinedPropertyError(PropertyFetch $node, ReflectionClass $reflClass)
+	{
+		$class = $reflClass->getName();
+		$prop = $node->name;
+		$msg = "Undefined property: $class::\$$prop";
+		return new Error($msg, $node);
 	}
 }
