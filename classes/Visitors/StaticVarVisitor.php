@@ -18,7 +18,7 @@ class StaticVarVisitor extends AbstractNodeVisitor implements NodeVisitorInterfa
 		$ctx = $this->getContext();
 
 		foreach ($node->vars as $var) {
-			$ctx->setVariable($var->name, $var->default);
+			$ctx->setVariable($var->name, $var);
 		}
 	}
 }
