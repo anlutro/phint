@@ -60,7 +60,7 @@ class TryCatchVisitor extends AbstractNodeVisitor implements NodeVisitorInterfac
 	private function createClassNotExceptionError($className, Node $node)
 	{
 		$className = ltrim($className, '\\');
-		$msg = "Trying to catch non-exception class: $className";
+		$msg = "Cannot catch class that is not an exception: $className";
 		return new Error($msg, $node);
 	}
 }
