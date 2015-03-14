@@ -45,6 +45,7 @@ class Checker
 		$this->addVisitor('Phint\Visitors\BooleanNotVisitor');
 		$this->addVisitor('Phint\Visitors\BinaryOpVisitor');
 		$this->addVisitor('Phint\Visitors\TernaryVisitor');
+		$this->addVisitor('Phint\Visitors\InstanceofVisitor');
 		$this->addVisitor('Phint\Visitors\StringWithVariableVisitor');
 		$this->addVisitor('Phint\Visitors\ObjectPropertyVisitor');
 		$this->addVisitor('Phint\Visitors\MethodCallVisitor');
@@ -56,7 +57,7 @@ class Checker
 		$this->addVisitor('Phint\Visitors\ForVisitor');
 		$this->addVisitor('Phint\Visitors\ForeachVisitor');
 		$this->addVisitor('Phint\Visitors\TryCatchVisitor');
-		$this->addVisitor('Phint\Visitors\InstanceofVisitor');
+		$this->addVisitor('Phint\Visitors\SwitchVisitor');
 	}
 
 	public function check($path)
