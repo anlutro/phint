@@ -31,14 +31,22 @@ class ForeachVisitor extends AbstractNodeVisitor implements NodeVisitorInterface
 	private function guessValueType(Foreach_ $node)
 	{
 		if ($node->expr instanceof \PhpParser\Node\Expr\Variable) {
-			$var = $this->getContext()->getVariable($node->expr->name);
-			if (!$type = $var->getType()) {
-				return null;
-			}
+			$var = $this->getContext()
+				->getVariable($node->expr->name);
+			$type = $var->getType();
+		} elseif (
+			$node->expr instanceof \PhpParser\Node\Expr\MethodCall ||
+			$node->expr instanceof \PhpParser\Node\Expr\PropertyFetch
+		) {
+			$type = $this->traverseVariableChain($node->expr);
+		}
 
+		if (isset($type) && $type) {
 			if (substr($type, -2) == '[]') {
 				return substr($type, 0, -2);
 			}
+
+			// TODO: iterator classes etc?
 		}
 	}
 }

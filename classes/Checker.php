@@ -7,9 +7,32 @@ use Phint\Chain\ChainFactory;
 
 class Checker
 {
+	/**
+	 * The parser instance.
+	 *
+	 * @var Parser
+	 */
 	protected $parser;
+
+	/**
+	 * The context wrapper instance.
+	 *
+	 * @var ContextWrapper
+	 */
 	protected $context;
+
+	/**
+	 * The error bag instance.
+	 *
+	 * @var ErrorBag
+	 */
 	protected $errors;
+
+	/**
+	 * The node traverser instance.
+	 *
+	 * @var NodeTraverser
+	 */
 	protected $traverser;
 
 	public function __construct(

@@ -27,6 +27,13 @@ class ChainFactory
 		$this->errors = $errors;
 	}
 
+	/**
+	 * Create a new chain.
+	 *
+	 * @param  Node   $node
+	 *
+	 * @return Chain
+	 */
 	public function create(Node $node)
 	{
 		$links = [];

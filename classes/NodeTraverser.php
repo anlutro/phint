@@ -6,7 +6,18 @@ use Phint\Chain\ChainFactory;
 
 class NodeTraverser
 {
+	/**
+	 * The visitor collection instance.
+	 *
+	 * @var VisitorCollection
+	 */
 	protected $visitors;
+
+	/**
+	 * The chain factory.
+	 *
+	 * @var ChainFactory
+	 */
 	protected $chainFactory;
 
 	public function __construct(VisitorCollection $visitors,
@@ -31,6 +42,13 @@ class NodeTraverser
 		return $this->visitors->getVisitor($visitor);
 	}
 
+	/**
+	 * Traverse an array of nodes.
+	 *
+	 * @param  Node[]  $nodes
+	 *
+	 * @return void
+	 */
 	public function traverse(array $nodes)
 	{
 		foreach ($nodes as $node) {

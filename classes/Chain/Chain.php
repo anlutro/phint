@@ -98,11 +98,7 @@ class Chain
 			var_dump($node); die();
 		}
 
-		if ($this->updateType($type) === false) {
-			return false;
-		}
-
-		return true;
+		return $this->updateType($type);
 	}
 
 	private function getStaticMethodCallType(StaticCall $node)
@@ -192,7 +188,6 @@ class Chain
 				if (!$this->classExists($tmpType)) {
 					$className = $this->currentReflClass->getName();
 					$this->addClassNotFoundError($tmpType, $className, $this->currentLink);
-					var_dump($tmpType);
 					return false;
 				}
 				if ($arrayOf) {
@@ -276,8 +271,7 @@ class Chain
 			return false;
 		}
 
-		$this->updateType($type);
-		return true;
+		return $this->updateType($type);
 	}
 
 	private function checkPropertyFetch(PropertyFetch $node)
@@ -306,8 +300,7 @@ class Chain
 			return false;
 		}
 
-		$this->updateType($type);
-		return true;
+		return $this->updateType($type);
 	}
 
 	private function addMethodOnNonObjectError(MethodCall $node)

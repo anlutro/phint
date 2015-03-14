@@ -10,7 +10,9 @@ use PhpParser\Node;
 
 class ContextWrapper
 {
+	/** @var FileContext */
 	protected $fileContext;
+	/** @var FunctionContext */
 	protected $funcContext;
 
 	public function __construct(
@@ -108,6 +110,13 @@ class ContextWrapper
 		$this->funcContext->unsetVariable($name);
 	}
 
+	/**
+	 * Get a variable.
+	 *
+	 * @param  string $name
+	 *
+	 * @return Variable|null
+	 */
 	public function getVariable($name)
 	{
 		return $this->funcContext->getVariable($name);
@@ -123,6 +132,9 @@ class ContextWrapper
 		$this->funcContext->setReflectionFunction($reflFunc);
 	}
 
+	/**
+	 * @return \ReflectionFunction
+	 */
 	public function getReflectionFunction()
 	{
 		return $this->funcContext->getReflectionFunction();

@@ -6,8 +6,25 @@ use PhpParser\Node;
 
 abstract class AbstractNodeVisitor
 {
+	/**
+	 * The node traverser instance.
+	 *
+	 * @var NodeTraverser
+	 */
 	private $traverser;
+
+	/**
+	 * The context wrapper instance.
+	 *
+	 * @var ContextWrapper
+	 */
 	private $context;
+
+	/**
+	 * The error bag instance.
+	 *
+	 * @var ErrorBag
+	 */
 	private $errors;
 
 	public function __construct(
