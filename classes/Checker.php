@@ -58,6 +58,7 @@ class Checker
 		$this->addVisitor('Phint\Visitors\ForeachVisitor');
 		$this->addVisitor('Phint\Visitors\TryCatchVisitor');
 		$this->addVisitor('Phint\Visitors\SwitchVisitor');
+		$this->addVisitor('Phint\Visitors\ClosureVisitor');
 	}
 
 	public function check($path)

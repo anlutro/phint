@@ -19,6 +19,16 @@ class ContextWrapper
 		$this->funcContext = $funcContext ?: new FunctionContext();
 	}
 
+	public function getFunctionContext()
+	{
+		return $this->funcContext;
+	}
+
+	public function setFunctionContext(FunctionContext $funcContext)
+	{
+		$this->funcContext = $funcContext;
+	}
+
 	public function setVariable($name, $value)
 	{
 		$this->funcContext->setVariable($name, $value);

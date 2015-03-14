@@ -1,6 +1,8 @@
 <?php
 namespace Phint;
 
+use Phint\Context\FunctionContext;
+
 abstract class AbstractNodeVisitor
 {
 	private $traverser;
@@ -35,5 +37,13 @@ abstract class AbstractNodeVisitor
 			}
 			$this->traverser->traverse($nodes);
 		}
+	}
+
+	protected function recurseWithNewContext(FunctionContext $newContext, array $nodes)
+	{
+		$oldContext = $this->context->getFunctionContext();
+		$this->context->setFunctionContext($newContext);
+		$this->recurse($nodes);
+		$this->context->setFunctionContext($oldContext);
 	}
 }
