@@ -18,30 +18,7 @@ class UseVisitor extends AbstractNodeVisitor implements NodeVisitorInterface
 		$ctx = $this->getContext();
 
 		foreach ($node->uses as $use) {
-			$className = $use->name->toString();
-			if (!$this->classExists($className)) {
-				$this->addError($this->createClassNotFoundError($className, $node));
-			}
 			$ctx->import($use->name->toString(), $use->alias);
 		}
-	}
-
-	private function classExists($className)
-	{
-		if (PHP_VERSION_ID >= 50400) {
-			return class_exists($className)
-				|| interface_exists($className)
-				|| trait_exists($className);
-		} else {
-			return class_exists($className)
-				|| interface_exists($className);
-		}
-	}
-
-	private function createClassNotFoundError($className, Use_ $node)
-	{
-		$className = ltrim($className, '\\');
-		$msg = "Importing non-existant class: $className";
-		return new Error($msg, $node);
 	}
 }
