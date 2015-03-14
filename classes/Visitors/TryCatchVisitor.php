@@ -29,7 +29,7 @@ class TryCatchVisitor extends AbstractNodeVisitor implements NodeVisitorInterfac
 						$className, $catch->type));
 				} elseif ($className !== 'Exception') {
 					$refl = new ReflectionClass($className);
-					if (!$refl->isSubclassOf('Exception')) {
+					if (!$refl->isSubclassOf('Exception') && !$refl->isInterface()) {
 						$this->addError($this->createClassNotExceptionError(
 							$className, $catch->type));
 					}
