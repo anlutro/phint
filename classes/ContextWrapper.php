@@ -79,7 +79,7 @@ class ContextWrapper
 		}
 
 		if ($node instanceof \PhpParser\Node\Expr\New_) {
-			if ($node instanceof \PhpParser\Node\Name) {
+			if ($node->class instanceof \PhpParser\Node\Name) {
 				return $this->getClassName($node->class);
 			} else {
 				return 'object';
@@ -173,5 +173,15 @@ class ContextWrapper
 	public function getClassName($className)
 	{
 		return $this->fileContext->getClassName($className);
+	}
+
+	public function getFileName()
+	{
+		return $this->fileContext->getFileName();
+	}
+
+	public function setFileName($filename)
+	{
+		$this->fileContext->setFileName($filename);
 	}
 }

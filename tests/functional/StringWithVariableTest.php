@@ -2,7 +2,7 @@
 class StringWithVariableTest extends FunctionalTestCase
 {
 	/** @test */
-	public function regenerate()
+	public function generated_test()
 	{
 		$errors = $this->check(__DIR__.'/cases/StringWithVariableCase.php');
 		$this->assertEquals(5, count($errors));

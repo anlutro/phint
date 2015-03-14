@@ -54,6 +54,7 @@ class Checker
 		$this->addVisitor('Phint\Visitors\InstanceofVisitor');
 		$this->addVisitor('Phint\Visitors\StringWithVariableVisitor');
 		$this->addVisitor('Phint\Visitors\ObjectPropertyVisitor');
+		$this->addVisitor('Phint\Visitors\StaticMethodCallVisitor');
 		$this->addVisitor('Phint\Visitors\MethodCallVisitor');
 		$this->addVisitor('Phint\Visitors\NewVisitor');
 		$this->addVisitor('Phint\Visitors\FunctionCallVisitor');
@@ -72,6 +73,7 @@ class Checker
 		$this->errors->clear();
 		$code = file_get_contents($path);
 		$nodes = $this->parser->parse($code);
+		$this->context->setFileName($path);
 		$this->traverser->traverse($nodes);
 	}
 

@@ -6,10 +6,26 @@ use PhpParser\Node\Stmt\Class_ as ClassNode;
 
 class FileContext
 {
-	protected $imports = [];
+	protected $filename;
+	protected $namespace;
+	protected $imports;
 	protected $classNode;
 	protected $reflectionClass;
-	protected $namespace;
+
+	public function __construct(ImportBag $imports = null)
+	{
+		$this->imports = $imports ?: new ImportBag;
+	}
+
+	public function getFileName()
+	{
+		return $this->filename;
+	}
+
+	public function setFileName($filename)
+	{
+		$this->filename = $filename;
+	}
 
 	/**
 	 * Get the class node.
@@ -73,16 +89,7 @@ class FileContext
 
 	public function import($className, $alias = null)
 	{
-		$className = ltrim($className, '\\');
-
-		if ($alias) {
-			$key = $alias;
-		} else {
-			$parts = explode('\\', $className);
-			$key = end($parts);
-		}
-
-		$this->imports[$key] = $className;
+		$this->imports->add($className, $alias);
 	}
 
 	public function getClassName($className)
@@ -95,27 +102,18 @@ class FileContext
 			$className = $className->toString();
 		}
 
+		if ($className == 'static' || $className == 'self') {
+			return $this->reflectionClass->getName();
+		}
+
 		if ('\\' == $className[0]) {
 			return ltrim($className, '\\');
 		}
 
-		if ($importedClass = $this->findImportedClassName($className)) {
+		if ($importedClass = $this->imports->findImportedClassName($className)) {
 			return $importedClass;
 		}
 
 		return ($this->namespace ? $this->namespace.'\\' : '').$className;
-	}
-
-	private function findImportedClassName($className)
-	{
-		$parts = explode('\\', $className);
-		$firstPart = $parts[0];
-
-		if (isset($this->imports[$firstPart])) {
-			$parts[0] = $this->imports[$firstPart];
-			return implode('\\', $parts);
-		}
-
-		return null;
 	}
 }

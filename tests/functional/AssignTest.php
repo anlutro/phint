@@ -2,7 +2,7 @@
 class AssignTest extends FunctionalTestCase
 {
 	/** @test */
-	public function regenerate()
+	public function generated_test()
 	{
 		$errors = $this->check(__DIR__.'/cases/AssignCase.php');
 		$this->assertEquals(3, count($errors));

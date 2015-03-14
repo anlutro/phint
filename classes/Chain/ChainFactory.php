@@ -32,7 +32,7 @@ class ChainFactory
 		$links = [];
 		$link = $node;
 
-		while (! $link instanceof Variable) {
+		while (in_array('var', $link->getSubnodeNames())) {
 			$links[] = $link;
 			$link = $link->var;
 		}

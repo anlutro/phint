@@ -2,7 +2,7 @@
 class WhileTest extends FunctionalTestCase
 {
 	/** @test */
-	public function regenerate()
+	public function generated_test()
 	{
 		$errors = $this->check(__DIR__.'/cases/WhileCase.php');
 		$this->assertEquals(1, count($errors));

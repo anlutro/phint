@@ -17,6 +17,10 @@ class MethodCallVisitor extends AbstractNodeVisitor implements NodeVisitorInterf
 			return;
 		}
 
+		$this->traverseVariableChain($node);
+
+		return; // old code below
+
 		if ($node->var->name == 'this' && ! $node->var->var) {
 			// method name is dynamic (variables/string concatenation)
 			if (!is_string($node->name)) {

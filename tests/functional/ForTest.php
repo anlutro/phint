@@ -2,7 +2,7 @@
 class ForTest extends FunctionalTestCase
 {
 	/** @test */
-	public function regenerate()
+	public function generated_test()
 	{
 		$errors = $this->check(__DIR__.'/cases/ForCase.php');
 		$this->assertEquals(2, count($errors));

@@ -1,16 +1,11 @@
 <?php
 // this code generates functional tests. it is a very useful abomination
 
-$visitors = glob(dirname(__DIR__).'/classes/Visitors/*.php');
-foreach ($visitors as $visitor) {
-	$visitor = (str_replace('Visitor.php', '', basename($visitor)));
+$cases = glob(dirname(__DIR__).'/tests/functional/cases/*.php');
+foreach ($cases as $case) {
+	$case = (str_replace('Case.php', '', basename($case)));
 
-	$path = __DIR__.'/functional/cases/'.$visitor.'Case.php';
-	if (!file_exists($path)) {
-		continue;
-	}
-
-	$path = __DIR__.'/functional/'.$visitor.'Test.php';
+	$path = __DIR__.'/functional/'.$case.'Test.php';
 	if (!file_exists($path)) {
 		$generator = "/**/\t\t\$code = \$this->generateTests(\$errors);
 \$test = file_get_contents(__FILE__);
@@ -18,12 +13,12 @@ foreach ($visitors as $visitor) {
 file_put_contents(__FILE__, \$test);/**/";
 		$generator = str_replace('LEN', strlen($generator), $generator);
 		$code = "<?php
-class {$visitor}Test extends FunctionalTestCase
+class {$case}Test extends FunctionalTestCase
 {
 	/** @test */
-	public function regenerate()
+	public function generated_test()
 	{
-		\$errors = \$this->check(__DIR__.'/cases/{$visitor}Case.php');
+		\$errors = \$this->check(__DIR__.'/cases/{$case}Case.php');
 $generator	}
 }
 ";
