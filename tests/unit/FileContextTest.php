@@ -4,7 +4,7 @@ use Phint\Context\FileContext;
 class FileContextTest extends UnitTestCase
 {
 	/** @test */
-	public function returnsClassNameWithNamespaceAppended()
+	public function returns_class_name_with_namespace_appended()
 	{
 		$ctx = new FileContext;
 		$ctx->setNamespace('Foo');
@@ -12,7 +12,7 @@ class FileContextTest extends UnitTestCase
 	}
 
 	/** @test */
-	public function returnsFQCNasIs()
+	public function returns_fqcn_as_is()
 	{
 		$ctx = new FileContext;
 		$ctx->setNamespace('Foo');
@@ -20,7 +20,7 @@ class FileContextTest extends UnitTestCase
 	}
 
 	/** @test */
-	public function checksAgainstImportedClasses()
+	public function checks_against_imported_classes()
 	{
 		$ctx = new FileContext;
 		$ctx->setNamespace('Foo');

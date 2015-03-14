@@ -57,9 +57,8 @@ class ContextWrapper
 		if ($node instanceof \PhpParser\Node\Param) {
 			if ($type = $node->type) {
 				if ($type instanceof \PhpParser\Node\Name) {
-					$type = $this->getClassName($type);
+					return $this->getClassName($type);
 				}
-				return $type;
 			}
 
 			$reflFunc = $this->getReflectionFunction();
@@ -72,10 +71,9 @@ class ContextWrapper
 				if (Variable::isClassType($type)) {
 					$type = $this->getClassName($type);
 				}
-				return $type;
 			}
 
-			return null;
+			return $type;
 		}
 
 		if ($node instanceof \PhpParser\Node\Expr\New_) {

@@ -355,7 +355,7 @@ class Chain
 			$typeName = 'return value type';
 			$nodeString = "method {$class}::{$node->name}()";
 		} elseif ($node instanceof PropertyFetch) {
-			$typeName = 'property type';
+			$typeName = 'type';
 			$nodeString = "property {$class}::\${$node->name}";
 		} else {
 			var_dump($node); die();

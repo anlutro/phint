@@ -5,7 +5,7 @@ class NestedObjectOperationsTest extends FunctionalTestCase
 	public function generated_test()
 	{
 		$errors = $this->check(__DIR__.'/cases/NestedObjectOperationsCase.php');
-		$this->assertEquals(8, count($errors));
+		$this->assertEquals(10, count($errors));
 		$this->assertEquals('26', $errors[0]->getLineNumber());
 		$this->assertEquals('Call to undefined method: One::one()', $errors[0]->getMessage());
 		$this->assertEquals('27', $errors[1]->getLineNumber());
@@ -22,5 +22,9 @@ class NestedObjectOperationsTest extends FunctionalTestCase
 		$this->assertEquals('Call to undefined method: Two::two()', $errors[6]->getMessage());
 		$this->assertEquals('41', $errors[7]->getLineNumber());
 		$this->assertEquals('Undefined property: Two::$two', $errors[7]->getMessage());
+		$this->assertEquals('57', $errors[8]->getLineNumber());
+		$this->assertEquals('Cannot determine type of variable $one', $errors[8]->getMessage());
+		$this->assertEquals('58', $errors[9]->getLineNumber());
+		$this->assertEquals('Cannot determine type of variable $one', $errors[9]->getMessage());
 	}
 }

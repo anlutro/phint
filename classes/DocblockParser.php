@@ -3,20 +3,23 @@ namespace Phint;
 
 class DocblockParser
 {
+	const PARAM_REGEX = '/\@param\s+([a-zA-Z\\\\\|\[\]]+)\s+(\$[a-zA-Z_]+).*/';
+
 	public static function getParamType($docblock, $paramName)
 	{
-		while (($pos = strpos($docblock, '@param')) !== false) {
-			$substr = substr($docblock, $pos);
-			$substr = substr($substr, 0, $pos = strpos($substr, "\n"));
-			preg_match('/\@param\s+([a-zA-Z\\\\\|\[\]]+)\s+(\$[a-zA-Z_]+).*/', $substr, $matches);
-			if ($matches) {
-				$type = $matches[1];
-				$name = $matches[2];
-				if ($name == '$'.$paramName) {
-					return $type;
-				}
+		if ($paramName[0] != '$') {
+			$paramName = '$'.$paramName;
+		}
+
+		preg_match_all(static::PARAM_REGEX, $docblock, $matches);
+		if (!$matches) {
+			return null;
+		}
+
+		foreach ($matches[2] as $key => $value) {
+			if ($value === $paramName) {
+				return $matches[1][$key];
 			}
-			$docblock = substr($docblock, $pos);
 		}
 
 		return null;

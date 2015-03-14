@@ -3,6 +3,7 @@ namespace Phint\Visitors;
 
 use Phint\AbstractNodeVisitor;
 use Phint\NodeVisitorInterface;
+use Phint\Context\Variable;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\Foreach_;
 
@@ -17,11 +18,27 @@ class ForeachVisitor extends AbstractNodeVisitor implements NodeVisitorInterface
 		$this->recurse($node->expr);
 
 		$ctx = $this->getContext();
-		$ctx->setVariable($node->valueVar->name, $node->valueVar);
+		$valueVar = new Variable($node->valueVar, $this->guessValueType($node));
+		$ctx->setVariable($node->valueVar->name, $valueVar);
+
 		if ($node->keyVar) {
 			$ctx->setVariable($node->keyVar->name, $node->keyVar);
 		}
 
 		$this->recurse($node->stmts);
+	}
+
+	private function guessValueType(Foreach_ $node)
+	{
+		if ($node->expr instanceof \PhpParser\Node\Expr\Variable) {
+			$var = $this->getContext()->getVariable($node->expr->name);
+			if (!$type = $var->getType()) {
+				return null;
+			}
+
+			if (substr($type, -2) == '[]') {
+				return substr($type, 0, -2);
+			}
+		}
 	}
 }
