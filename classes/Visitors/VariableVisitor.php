@@ -9,6 +9,10 @@ use PhpParser\Node\Expr\Variable;
 
 class VariableVisitor extends AbstractNodeVisitor implements NodeVisitorInterface
 {
+	protected static $globals = [
+		'GLOBALS', '_SESSION', '_SERVER', '_ENV', '_GET', '_POST', '_REQUEST',
+	];
+
 	public function visit(Node $node)
 	{
 		if (! $node instanceof Variable) {
@@ -16,7 +20,7 @@ class VariableVisitor extends AbstractNodeVisitor implements NodeVisitorInterfac
 		}
 
 		$ctx = $this->getContext();
-		if (!$ctx->getVariable($node->name)) {
+		if (!$ctx->getVariable($node->name) && !in_array($node->name, static::$globals, true)) {
 			$this->addError($this->createError($node));
 		}
 	}
