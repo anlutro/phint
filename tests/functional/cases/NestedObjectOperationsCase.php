@@ -66,4 +66,17 @@ class NestedObjectOperationsCase
 			$dt->modify('+1 day');
 		}
 	}
+
+	public function f6()
+	{
+		$dts = $this->getDTs();
+		foreach ($dts as $dt) {
+			$dt->modify('+1 day');
+		}
+	}
+
+	/**
+	 * @return DateTime[]
+	 */
+	public function getDTs() {}
 }

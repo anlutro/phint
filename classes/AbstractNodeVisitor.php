@@ -55,6 +55,6 @@ abstract class AbstractNodeVisitor
 
 	protected function traverseVariableChain(Node $node)
 	{
-		$this->traverser->traverseVariableChain($node);
+		return $this->traverser->traverseVariableChain($node);
 	}
 }

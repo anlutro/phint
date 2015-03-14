@@ -181,15 +181,28 @@ class Chain
 
 	private function updateType($type)
 	{
-		if (\Phint\Context\Variable::isClassType($type)) {
-			if (!$this->classExists($type)) {
-				$className = $this->currentReflClass->getName();
-				$this->addClassNotFoundError($type, $className, $this->currentLink);
-				return false;
+		$tmpTypes = explode('|', $type);
+		foreach ($tmpTypes as $tmpType) {
+			$arrayOf = false;
+			if (substr($tmpType, -2) == '[]') {
+				$arrayOf = true;
+				$tmpType = substr($tmpType, 0, -2);
 			}
-			$this->currentReflClass = new \ReflectionClass($type);
-		} else {
-			$this->currentReflClass = null;
+			if (\Phint\Context\Variable::isClassType($tmpType)) {
+				if (!$this->classExists($tmpType)) {
+					$className = $this->currentReflClass->getName();
+					$this->addClassNotFoundError($tmpType, $className, $this->currentLink);
+					var_dump($tmpType);
+					return false;
+				}
+				if ($arrayOf) {
+					$this->currentReflClass = null;
+				} else {
+					$this->currentReflClass = new \ReflectionClass($tmpType);
+				}
+			} else {
+				$this->currentReflClass = null;
+			}
 		}
 
 		$this->currentType = $type;

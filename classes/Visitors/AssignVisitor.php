@@ -9,6 +9,7 @@ use PhpParser\Node;
 use PhpParser\Node\Expr\Assign;
 use PhpParser\Node\Expr\AssignRef;
 use PhpParser\Node\Expr\Variable;
+use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\PropertyFetch;
 use PhpParser\Node\Expr\List_;
 
@@ -51,11 +52,21 @@ class AssignVisitor extends AbstractNodeVisitor implements NodeVisitorInterface
 			}
 		}
 
-		$this->recurse($node->expr);
+		if (
+			$node->expr instanceof MethodCall ||
+			$node->expr instanceof PropertyFetch
+		) {
+			$type = $this->traverseVariableChain($node->expr);
+			$var = new \Phint\Context\Variable($node->expr, $type);
+		} else {
+			$this->recurse($node->expr);
+			$var = $node->expr;
+		}
 
 		if ($node->var instanceof Variable) {
-			$ctx->setVariable($node->var->name, $node->expr);
+			$ctx->setVariable($node->var->name, $var);
 		}
+
 	}
 
 	private function createUndefinedPropertyError(PropertyFetch $node, ReflectionClass $reflClass)

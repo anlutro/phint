@@ -43,6 +43,6 @@ class NodeTraverser
 	public function traverseVariableChain(Node $node)
 	{
 		$chain = $this->chainFactory->create($node);
-		$chain->check();
+		return $chain->check();
 	}
 }
