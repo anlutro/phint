@@ -84,6 +84,11 @@ class ContextWrapper
 			}
 		}
 
+		if ($node instanceof \PhpParser\Node\Expr\Variable) {
+			$var = $this->getVariable($node->name);
+			return $var ? $var->getType() : null;
+		}
+
 		if (
 			$node instanceof \PhpParser\Node\Scalar\String ||
 			$node instanceof \PhpParser\Node\Scalar\Encapsed
