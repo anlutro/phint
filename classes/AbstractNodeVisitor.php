@@ -2,6 +2,7 @@
 namespace Phint;
 
 use Phint\Context\FunctionContext;
+use PhpParser\Node;
 
 abstract class AbstractNodeVisitor
 {
@@ -50,5 +51,10 @@ abstract class AbstractNodeVisitor
 		$this->context->setFunctionContext($newContext);
 		$this->recurse($nodes);
 		$this->context->setFunctionContext($oldContext);
+	}
+
+	protected function traverseVariableChain(Node $node)
+	{
+		$this->traverser->traverseVariableChain($node);
 	}
 }

@@ -26,17 +26,14 @@ class ClassMethodVisitor extends AbstractNodeVisitor implements NodeVisitorInter
 
 		foreach ($node->params as $param) {
 			if ($param->type instanceof Name) {
-				$className = $param->type->toString();
-				if ($param->type->isFullyQualified()) {
-					$className = '\\'.$className;
-				}
-				$className = $ctx->getClassName($className);
-				if (!$this->classExists($className)) {
+				$type = $ctx->getClassName($param->type);
+				if (!$this->classExists($type)) {
 					$this->addError($this->createClassNotFoundError(
-						$className, $node, $param
+						$reflClass->getName(), $node, $param, $type
 					));
 				}
 			}
+
 			$ctx->setVariable($param->name, $param);
 		}
 
@@ -50,13 +47,14 @@ class ClassMethodVisitor extends AbstractNodeVisitor implements NodeVisitorInter
 		return class_exists($className) || interface_exists($className);
 	}
 
-	private function createClassNotFoundError($className, ClassMethod $node,
-		Param $param)
+	private function createClassNotFoundError($class, ClassMethod $node,
+		Param $param, $type)
 	{
-		$className = ltrim($className, '\\');
-		$method = $node->name.'::'.$param->name;
+		$class = ltrim($class, '\\');
+		$type = ltrim($type, '\\');
+		$method = $class.'::'.$node->name;
 		$msg = "$method() argument \${$param->name} is type-hinted "
-			. "against a non-existant class: $className";
+			. "against a non-existant class: $type";
 		return new Error($msg, $param);
 	}
 }

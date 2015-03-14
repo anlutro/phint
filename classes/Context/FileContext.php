@@ -30,7 +30,7 @@ class FileContext
 	/**
 	 * Set the class node.
 	 *
-	 * @param $classNode ClassNode
+	 * @param ClassNode $classNode
 	 */
 	public function setClassNode(ClassNode $classNode)
 	{
@@ -50,7 +50,7 @@ class FileContext
 	/**
 	 * Set the reflection class.
 	 *
-	 * @param $reflectionClass ReflectionClass
+	 * @param ReflectionClass $reflectionClass
 	 */
 	public function setReflectionClass(ReflectionClass $reflectionClass)
 	{
@@ -70,7 +70,7 @@ class FileContext
 	/**
 	 * Set the namespace.
 	 *
-	 * @param $namespace string
+	 * @param string $namespace
 	 */
 	public function setNamespace($namespace)
 	{

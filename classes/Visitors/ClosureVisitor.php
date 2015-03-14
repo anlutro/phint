@@ -28,11 +28,11 @@ class ClosureVisitor extends AbstractNodeVisitor implements NodeVisitorInterface
 					$this->addError($this->createUndefinedVariableError($use));
 				}
 			}
-			$newContext->setVariable($use->var, $use);
+			$newContext->setVariable($use->var, $ctx->createVariable($use));
 		}
 
 		foreach ($node->params as $param) {
-			$newContext->setVariable($param->name, $param);
+			$newContext->setVariable($param->name, $ctx->createVariable($param));
 		}
 
 		if (PHP_VERSION_ID >= 50400) {

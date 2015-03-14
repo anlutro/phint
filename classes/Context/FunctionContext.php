@@ -40,7 +40,7 @@ class FunctionContext
 		$this->functionNode = $functionNode;
 	}
 
-	public function setVariable($name, $value)
+	public function setVariable($name, Variable $value)
 	{
 		$this->variables[$name] = $value;
 	}

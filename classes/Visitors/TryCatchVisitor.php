@@ -19,10 +19,11 @@ class TryCatchVisitor extends AbstractNodeVisitor implements NodeVisitorInterfac
 
 		$this->recurse($node->stmts);
 
+		$ctx = $this->getContext();
+
 		foreach ($node->catches as $catch) {
 			if ($catch->type) {
-				$className = $this->getContext()
-					->getClassName($catch->type);
+				$className = $ctx->getClassName($catch->type);
 
 				if (!$this->classExists($className)) {
 					$this->addError($this->createClassNotFoundError(
@@ -37,7 +38,7 @@ class TryCatchVisitor extends AbstractNodeVisitor implements NodeVisitorInterfac
 			}
 
 			$newContext = $this->cloneContext();
-			$newContext->setVariable($catch->var, $catch);
+			$newContext->setVariable($catch->var, $ctx->createVariable($catch));
 
 			$this->recurseWithNewContext($newContext, $catch->stmts);
 		}

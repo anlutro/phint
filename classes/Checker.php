@@ -3,30 +3,35 @@ namespace Phint;
 
 use PhpParser\Parser;
 use PhpParser\Lexer;
+use Phint\Chain\ChainFactory;
 
 class Checker
 {
 	protected $parser;
-	protected $wrapper;
+	protected $context;
 	protected $errors;
 	protected $traverser;
 
 	public function __construct(
 		Parser $parser = null,
-		ContextWrapper $wrapper = null,
+		ContextWrapper $context = null,
 		ErrorBag $errors = null,
 		NodeTraverser $traverser = null
 	) {
 		$this->parser = $parser ?: new Parser(new Lexer);
-		$this->wrapper = $wrapper ?: new ContextWrapper();
+		$this->context = $context ?: new ContextWrapper();
 		$this->errors = $errors ?: new ErrorBag();
-		$this->traverser = $traverser ?: new NodeTraverser();
+		$visitorCollection = new VisitorCollection();
+		$chainFactory = new ChainFactory($this->parser, $visitorCollection,
+			$this->context, $this->errors);
+		$this->traverser = $traverser ?: new NodeTraverser(
+			$visitorCollection, $chainFactory);
 	}
 
 	public function addVisitor($visitor)
 	{
 		if (is_string($visitor)) {
-			$visitor = new $visitor($this->traverser, $this->wrapper, $this->errors);
+			$visitor = new $visitor($this->traverser, $this->context, $this->errors);
 		}
 		if (! $visitor instanceof NodeVisitorInterface) {
 			throw new \InvalidArgumentException('Visitor must be instance of NodeVisitorInterface');
