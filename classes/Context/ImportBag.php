@@ -18,10 +18,12 @@ class ImportBag
 
 	public function findImportedClassName($className)
 	{
-		$lastPart = $this->getLastPart($className);
+		$parts = explode('\\', $className);
+		$firstPart = $parts[0];
 
-		if (isset($this->imports[$lastPart])) {
-			return $this->imports[$lastPart];
+		if (isset($this->imports[$firstPart])) {
+			$parts[0] = $this->imports[$firstPart];
+			return implode('\\', $parts);
 		}
 
 		return null;
