@@ -41,6 +41,7 @@ class Checker
 		$this->addVisitor('Phint\Visitors\ClassVisitor');
 		$this->addVisitor('Phint\Visitors\ClassMethodVisitor');
 		$this->addVisitor('Phint\Visitors\VariableVisitor');
+		$this->addVisitor('Phint\Visitors\StaticVarVisitor');
 		$this->addVisitor('Phint\Visitors\AssignVisitor');
 		$this->addVisitor('Phint\Visitors\BooleanNotVisitor');
 		$this->addVisitor('Phint\Visitors\BinaryOpVisitor');
