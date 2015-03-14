@@ -79,19 +79,28 @@ class FileContext
 
 	public function import($className, $alias = null)
 	{
+		$className = ltrim($className, '\\');
 		$this->imports->add($className, $alias);
 	}
 
 	public function getClassName($className)
 	{
+		if ($className instanceof \PhpParser\Node\Name) {
+			if ($className->isFullyQualified()) {
+				$className = '\\'.$className->toString();
+			} else {
+				$className = $className->toString();
+			}
+		}
+
 		if ('\\' == $className[0]) {
-			return $className;
+			return substr($className, 1);
 		}
 
 		if ($importedClass = $this->imports->findImportedClassName($className)) {
 			return $importedClass;
 		}
 
-		return $this->namespace.'\\'.$className;
+		return ($this->namespace ? $this->namespace.'\\' : '').$className;
 	}
 }

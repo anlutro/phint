@@ -21,20 +21,15 @@ class TryCatchVisitor extends AbstractNodeVisitor implements NodeVisitorInterfac
 
 		foreach ($node->catches as $catch) {
 			if ($catch->type) {
-				$className = $catch->type->toString();
-				if ($catch->type->isFullyQualified()) {
-					$className = '\\'.$className;
-				}
+				$className = $this->getContext()
+					->getClassName($catch->type);
+
 				if (!$this->classExists($className)) {
 					$this->addError($this->createClassNotFoundError(
 						$className, $catch->type));
-				} else {
+				} elseif ($className !== 'Exception') {
 					$refl = new ReflectionClass($className);
-					static $exception;
-					if (!isset($exception)) {
-						$exception = new \Exception;
-					}
-					if (!$refl->isInstance($exception)) {
+					if (!$refl->isSubclassOf('Exception')) {
 						$this->addError($this->createClassNotExceptionError(
 							$className, $catch->type));
 					}

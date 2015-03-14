@@ -16,7 +16,7 @@ class FileContextTest extends UnitTestCase
 	{
 		$ctx = new FileContext;
 		$ctx->setNamespace('Foo');
-		$this->assertEquals('\\Bar', $ctx->getClassName('\\Bar'));
+		$this->assertEquals('Bar', $ctx->getClassName('\\Bar'));
 	}
 
 	/** @test */
