@@ -34,10 +34,12 @@ class TryCatchVisitor extends AbstractNodeVisitor implements NodeVisitorInterfac
 							$className, $catch->type));
 					}
 				}
-
 			}
 
-			$this->recurse($catch->stmts);
+			$newContext = $this->cloneContext();
+			$newContext->setVariable($catch->var, $catch);
+
+			$this->recurseWithNewContext($newContext, $catch->stmts);
 		}
 
 		if ($node->finallyStmts) {

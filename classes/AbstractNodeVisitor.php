@@ -24,6 +24,11 @@ abstract class AbstractNodeVisitor
 		return $this->context;
 	}
 
+	protected function cloneContext()
+	{
+		return clone $this->context->getFunctionContext();
+	}
+
 	protected function addError(Error $error)
 	{
 		$this->errors->add($error);
