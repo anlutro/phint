@@ -45,9 +45,27 @@ class FunctionCallVisitor extends AbstractNodeVisitor implements NodeVisitorInte
 			return;
 		}
 
-		// look for function parameters passed by reference
 		$refl = new ReflectionFunction($func);
-		foreach ($refl->getParameters() as $param) {
+		$params = $refl->getParameters();
+
+		// verify number of arguments
+		if (count($node->args) > count($params)) {
+			// cannot error on this as php functions can use func_get_args()
+		}
+
+		$requiredParams = 0;
+		foreach ($params as $param) {
+			if ($param->isOptional() || $param->isDefaultValueAvailable()) {
+				break;
+			}
+			$requiredParams++;
+		}
+		if (count($node->args) < $requiredParams) {
+			$this->addError($this->createNotEnoughParamsError($node, $func, $requiredParams));
+		}
+
+		// look for function parameters passed by reference
+		foreach ($params as $param) {
 			if ($param->isPassedByReference()) {
 				$pos = $param->getPosition();
 				if (isset($node->args[$pos])) {
@@ -64,6 +82,13 @@ class FunctionCallVisitor extends AbstractNodeVisitor implements NodeVisitorInte
 	private function createUndefinedFunctionError($func, FuncCall $node)
 	{
 		$msg = "Call to undefined function: $func";
+		return new Error($msg, $node);
+	}
+
+	private function createNotEnoughParamsError(FuncCall $node, $func, $requiredParams)
+	{
+		$numArgs = count($node->args);
+		$msg = "Function $func requires $requiredParams arguments, $numArgs given";
 		return new Error($msg, $node);
 	}
 }
