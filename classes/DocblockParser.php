@@ -9,13 +9,12 @@ class DocblockParser
 			$substr = substr($docblock, $pos);
 			$substr = substr($substr, 0, $pos = strpos($substr, "\n"));
 			preg_match('/\@param\s+([a-zA-Z\\\\\|\[\]]+)\s+(\$[a-zA-Z_]+).*/', $substr, $matches);
-			if (!$matches) {
-				continue;
-			}
-			$type = $matches[1];
-			$name = $matches[2];
-			if ($name == '$'.$paramName) {
-				return $type;
+			if ($matches) {
+				$type = $matches[1];
+				$name = $matches[2];
+				if ($name == '$'.$paramName) {
+					return $type;
+				}
 			}
 			$docblock = substr($docblock, $pos);
 		}
