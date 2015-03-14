@@ -9,8 +9,9 @@ Phint is a static code analysis tool for PHP. Very much a work in progress. Curr
 
 - Undefined variables
 - Properties/methods being called on `$this` exist
-- Classes being instantiated and checked against with `instanceof` actually exist
-- Functions being call actually exist
+- Classes being used in your code actually exist (includes instantiation, parameter type-hinting, `instanceof` and `use` imports)
+- Exception being caught actually exist and are exceptions (`catch (stdClass $e)` will error, for example)
+- Functions being called actually exist
 
 Features on the roadmap:
 
