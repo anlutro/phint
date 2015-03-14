@@ -62,10 +62,12 @@ class ContextWrapper
 				return $type;
 			}
 
-			$docblock = $this->getReflectionFunction()
-				->getDocComment();
+			$reflFunc = $this->getReflectionFunction();
+			if ($reflFunc) {
+				$docblock = $reflFunc->getDocComment();
+			}
 
-			if ($docblock) {
+			if (isset($docblock) && $docblock) {
 				$type = DocblockParser::getParamType($docblock, $node->name);
 				if (Variable::isClassType($type)) {
 					$type = $this->getClassName($type);
