@@ -20,9 +20,15 @@ class VariableVisitor extends AbstractNodeVisitor implements NodeVisitorInterfac
 		}
 
 		$ctx = $this->getContext();
-		if (!$ctx->getVariable($node->name) && !in_array($node->name, static::$globals, true)) {
+		if (
+			! $ctx->getVariable($node->name) &&
+			! in_array($node->name, static::$globals, true)
+		) {
 			$this->addError($this->createError($node));
+			return false;
 		}
+
+		return true;
 	}
 
 	private function createError(Variable $node)
