@@ -58,7 +58,7 @@ class Chain
 			return false;
 		}
 
-		return $this->currentType;
+		return $this->getCurrentType();
 	}
 
 	private function checkInitialNode(Node $node)
@@ -82,7 +82,7 @@ class Chain
 
 		if ($node instanceof Variable) {
 			$ctxVar = $this->context->getVariable($node->name);
-			$type = $ctxVar->getType();
+			$type = (array) $ctxVar->getType();
 			if (!$type) {
 				$this->addUndeterminableVariableTypeError($node);
 				return false;
@@ -125,8 +125,9 @@ class Chain
 
 		if (!$type) {
 			if (!$this->isLastLink) {
-				$this->addUndeterminableTypeError($node,
-					$this->currentReflClass->getName());
+				$className = $this->getCurrentReflectionClass()
+					->getName();
+				$this->addUndeterminableTypeError($node, $className);
 			}
 			return false;
 		}
@@ -152,16 +153,22 @@ class Chain
 			die();
 		}
 
-		if (\Phint\Context\Variable::isClassType($type)) {
-			if ($file != $this->context->getFileName()) {
-				$context = $this->getExternalFileContext($file);
-				$type = $context->getClassName($type);
-			} else {
-				$type = $this->context->getClassName($type);
+		$types = explode('|', $type);
+		$finalTypes = [];
+		foreach ($types as $type) {
+			if (\Phint\Context\Variable::isClassType($type)) {
+				if ($file != $this->context->getFileName()) {
+					$context = $this->getExternalFileContext($file);
+					$type = $context->getClassName($type);
+				} else {
+					$type = $this->context->getClassName($type);
+				}
 			}
+
+			$finalTypes[] = $type;
 		}
 
-		return $type;
+		return $finalTypes;
 	}
 
 	private function getExternalFileContext($file)
@@ -175,32 +182,28 @@ class Chain
 		return static::$externalFileContexts[$file];
 	}
 
-	private function updateType($type)
+	private function updateType(array $types)
 	{
-		$tmpTypes = explode('|', $type);
-		foreach ($tmpTypes as $tmpType) {
-			$arrayOf = false;
-			if (substr($tmpType, -2) == '[]') {
-				$arrayOf = true;
-				$tmpType = substr($tmpType, 0, -2);
-			}
-			if (\Phint\Context\Variable::isClassType($tmpType)) {
-				if (!$this->classExists($tmpType)) {
-					$className = $this->currentReflClass->getName();
-					$this->addClassNotFoundError($tmpType, $className, $this->currentLink);
+		$reflClass = [];
+		foreach ($types as $key => $type) {
+			$arrayOf = (substr($type, -2) == '[]');
+
+			if (\Phint\Context\Variable::isClassType($type)) {
+				$typeClass = $arrayOf ? substr($type, 0, -2) : $type;
+				if (!$this->classExists($typeClass)) {
+					$className = $this->getCurrentReflectionClass()
+						->getName();
+					$this->addClassNotFoundError($typeClass, $className, $this->currentLink);
 					return false;
 				}
-				if ($arrayOf) {
-					$this->currentReflClass = null;
-				} else {
-					$this->currentReflClass = new \ReflectionClass($tmpType);
+				if (!$arrayOf) {
+					$reflClass[] = new \ReflectionClass($type);
 				}
-			} else {
-				$this->currentReflClass = null;
 			}
 		}
 
-		$this->currentType = $type;
+		$this->currentReflClass = $reflClass;
+		$this->currentType = $types;
 		return true;
 	}
 
@@ -247,26 +250,28 @@ class Chain
 
 	private function checkMethodCall(MethodCall $node)
 	{
-		if (!$this->currentReflClass) {
+		$currentReflClass = $this->getCurrentReflectionClass();
+
+		if (!$currentReflClass) {
 			$this->addMethodOnNonObjectError($node);
 			return false;
 		}
 
-		if (!$this->currentReflClass->hasMethod($node->name)) {
-			if (!$this->currentReflClass->hasMethod('__call')) {
-				$class = $this->currentReflClass->getName();
+		if (!$currentReflClass->hasMethod($node->name)) {
+			if (!$currentReflClass->hasMethod('__call')) {
+				$class = $currentReflClass->getName();
 				$this->addUndefinedMethodError($node, $class, $node->name);
 			}
 			return false;
 		}
 
-		$reflMethod = $this->currentReflClass->getMethod($node->name);
+		$reflMethod = $currentReflClass->getMethod($node->name);
 		$type = $this->getReflectionType($reflMethod);
 
 		if (!$type) {
 			if (!$this->isLastLink) {
 				$this->addUndeterminableTypeError($node,
-					$this->currentReflClass->getName());
+					$currentReflClass->getName());
 			}
 			return false;
 		}
@@ -276,31 +281,45 @@ class Chain
 
 	private function checkPropertyFetch(PropertyFetch $node)
 	{
-		if (!$this->currentReflClass) {
+		$currentReflClass = $this->getCurrentReflectionClass();
+
+		if (!$currentReflClass) {
 			$this->addProperyOfNonObjectError($node);
 			return false;
 		}
 
-		if (!$this->currentReflClass->hasProperty($node->name)) {
-			if (!$this->currentReflClass->hasMethod('__get')) {
-				$class = $this->currentReflClass->getName();
+		if (!$currentReflClass->hasProperty($node->name)) {
+			if (!$currentReflClass->hasMethod('__get')) {
+				$class = $currentReflClass->getName();
 				$this->addUndefinedPropertyError($node, $class, $node->name);
 			}
 			return false;
 		}
 
-		$reflProperty = $this->currentReflClass->getProperty($node->name);
+		$reflProperty = $currentReflClass->getProperty($node->name);
 		$type = $this->getReflectionType($reflProperty);
 
 		if (!$type) {
 			if (!$this->isLastLink) {
 				$this->addUndeterminableTypeError($node,
-					$this->currentReflClass->getName());
+					$currentReflClass->getName());
 			}
 			return false;
 		}
 
 		return $this->updateType($type);
+	}
+
+	private function getCurrentType()
+	{
+		return count($this->currentType) > 1 || !$this->currentType
+			? $this->currentType : $this->currentType[0];
+	}
+
+	private function getCurrentReflectionClass()
+	{
+		return count($this->currentReflClass) > 1 || !$this->currentReflClass
+			? $this->currentReflClass : $this->currentReflClass[0];
 	}
 
 	private function addMethodOnNonObjectError(MethodCall $node)
