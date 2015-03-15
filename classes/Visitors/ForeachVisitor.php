@@ -34,21 +34,26 @@ class ForeachVisitor extends AbstractNodeVisitor implements NodeVisitorInterface
 			$var = $this->getContext()
 				->getVariable($node->expr->name);
 			if ($var) {
-				$type = $var->getType();
+				$types = $var->getType();
 			}
 		} elseif (
 			$node->expr instanceof \PhpParser\Node\Expr\MethodCall ||
 			$node->expr instanceof \PhpParser\Node\Expr\PropertyFetch
 		) {
-			$type = $this->traverseVariableChain($node->expr);
+			$types = $this->traverseVariableChain($node->expr);
 		}
 
-		if (isset($type) && $type) {
-			if (substr($type, -2) == '[]') {
-				return substr($type, 0, -2);
+		if (isset($types) && $types) {
+			if (!is_array($types)) {
+				$types = [$types];
 			}
+			foreach ($types as $type) {
+				if (substr($type, -2) == '[]') {
+					return substr($type, 0, -2);
+				}
 
-			// TODO: iterator classes etc?
+				// TODO: iterator classes etc?
+			}
 		}
 	}
 }
