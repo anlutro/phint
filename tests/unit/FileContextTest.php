@@ -16,6 +16,7 @@ class FileContextTest extends UnitTestCase
 	{
 		$ctx = new FileContext;
 		$ctx->setNamespace('Foo');
+		$ctx->import('Baz\\Bar');
 		$this->assertEquals('Bar', $ctx->getClassName('\\Bar'));
 	}
 
@@ -26,6 +27,7 @@ class FileContextTest extends UnitTestCase
 		$ctx->setNamespace('Foo');
 		$ctx->import('Baz\\Bar');
 		$this->assertEquals('Baz\\Bar', $ctx->getClassName('Bar'));
+		$this->assertEquals('Baz\\Bar\\Foo', $ctx->getClassName('Bar\\Foo'));
 		$ctx->import('Baz\\Bar', 'Alias');
 		$this->assertEquals('Baz\\Bar', $ctx->getClassName('Alias'));
 	}

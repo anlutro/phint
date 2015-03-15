@@ -165,6 +165,9 @@ class ContextWrapper
 		$this->fileContext->setReflectionClass($reflClass);
 	}
 
+	/**
+	 * @return \ReflectionClass
+	 */
 	public function getReflectionClass()
 	{
 		return $this->fileContext->getReflectionClass();

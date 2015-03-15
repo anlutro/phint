@@ -37,11 +37,19 @@ abstract class AbstractNodeVisitor
 		$this->errors = $errors;
 	}
 
+	/**
+	 * @return ContextWrapper
+	 */
 	protected function getContext()
 	{
 		return $this->context;
 	}
 
+	/**
+	 * Clone the current function context.
+	 *
+	 * @return Context\FunctionContext
+	 */
 	protected function cloneContext()
 	{
 		return clone $this->context->getFunctionContext();

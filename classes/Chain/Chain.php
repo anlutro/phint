@@ -82,11 +82,12 @@ class Chain
 
 		if ($node instanceof Variable) {
 			$ctxVar = $this->context->getVariable($node->name);
-			$type = (array) $ctxVar->getType();
+			$type = $ctxVar->getType();
 			if (!$type) {
 				$this->addUndeterminableVariableTypeError($node);
 				return false;
 			}
+			$type = (array) $type;
 		} elseif ($node instanceof StaticCall) {
 			$type = $this->getStaticMethodCallType($node);
 			if (!$type) {
@@ -95,6 +96,7 @@ class Chain
 		} elseif ($node instanceof FuncCall) {
 			die("TODO: Not yet implemented\n");
 		} else {
+			var_dump(__METHOD__.':'.__LINE__);
 			var_dump($node); die();
 		}
 
@@ -149,8 +151,12 @@ class Chain
 			$file = $reflector->getDeclaringClass()->getFileName();
 			$type = DocblockParser::getPropertyType($docstr);
 		} else {
-			var_dump($reflector);
-			die();
+			var_dump(__METHOD__.':'.__LINE__);
+			var_dump($reflector); die();
+		}
+
+		if (!$type) {
+			return null;
 		}
 
 		$types = explode('|', $type);
@@ -191,9 +197,10 @@ class Chain
 			if (\Phint\Context\Variable::isClassType($type)) {
 				$typeClass = $arrayOf ? substr($type, 0, -2) : $type;
 				if (!$this->classExists($typeClass)) {
-					$className = $this->getCurrentReflectionClass()
-						->getName();
-					$this->addClassNotFoundError($typeClass, $className, $this->currentLink);
+					$currentClass = $this->getCurrentReflectionClass();
+					$currentClass = $currentClass ? $currentClass->getName() : null;
+					$this->addClassNotFoundError($typeClass, $currentClass,
+						$this->currentLink);
 					return false;
 				}
 				if (!$arrayOf) {
@@ -241,8 +248,8 @@ class Chain
 		} elseif ($link instanceof PropertyFetch) {
 			return $this->checkPropertyFetch($link);
 		} else {
-			var_dump($link);
-			die();
+			var_dump(__METHOD__.':'.__LINE__);
+			var_dump($link); die();
 		}
 
 		return true;
@@ -337,8 +344,8 @@ class Chain
 		} elseif ($node instanceof PropertyFetch) {
 			$nodeName = 'Property '.$className.'::$'.$node->name;
 		} else {
-			var_dump($node);
-			die();
+			var_dump(__METHOD__.':'.__LINE__);
+			var_dump($node); die();
 		}
 		$msg = "$nodeName is type-hinted against a non-existant class: $type";
 		$this->errors->add(new Error($msg, $node));
@@ -383,6 +390,7 @@ class Chain
 			$typeName = 'type';
 			$nodeString = "property {$class}::\${$node->name}";
 		} else {
+			var_dump(__METHOD__.':'.__LINE__);
 			var_dump($node); die();
 		}
 		$msg = "Undeterminable $typeName of $nodeString";

@@ -3,7 +3,8 @@ namespace Phint;
 
 class DocblockParser
 {
-	const PARAM_REGEX = '/\@param\s+([a-zA-Z\\\\\|\[\]]+)\s+(\$[a-zA-Z_]+).*/';
+	const CLASS_REGEX = '[a-zA-Z\\\\\_\|\[\]]+';
+	const VAR_REGEX = '\$[a-zA-Z_]+';
 
 	public static function getParamType($docblock, $paramName)
 	{
@@ -11,7 +12,8 @@ class DocblockParser
 			$paramName = '$'.$paramName;
 		}
 
-		preg_match_all(static::PARAM_REGEX, $docblock, $matches);
+		$pattern = '/\@param\s+('.static::CLASS_REGEX.')\s+('.static::VAR_REGEX.').*/';
+		preg_match_all($pattern, $docblock, $matches);
 		if (!$matches) {
 			return null;
 		}
@@ -48,7 +50,7 @@ class DocblockParser
 		}
 
 		$docblock = substr($docblock, $pos);
-		preg_match('/\\'.$search.'\s+([a-zA-Z\\\\\|\[\]]+).*/', $docblock, $matches);
+		preg_match('/\\'.$search.'\s+('.static::CLASS_REGEX.').*/', $docblock, $matches);
 
 		if (isset($matches[1])) {
 			return $matches[1];
