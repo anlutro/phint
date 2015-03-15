@@ -16,7 +16,7 @@ Phint is a static code analysis tool for PHP. Very much a work in progress. Curr
 
 More features to come. Check the Github issues.
 
-## Installation and usage
+## Installation
 
 On a per-project basis:
 
@@ -30,22 +30,30 @@ Globally:
 	sudo mv phint.phar /usr/local/bin
 	phint /path/to/src
 
-Example output:
+## Usage
 
-	$ phint src/MyClass.php 
+Note that you **must** be in your project's root for Phint to run. You also need a composer autoloader to be present in `vendor/autoload.php`.
+
+Example output from a simple command run:
+
+	$ phint src/MyClass.php
 	Errors in src/MyClass.php:
 	L6   Undefined variable: $foo
 	L12  Tried instantiating non-existant class: Nonexistant
+
+You can pass `--strict` or `-s` as an arugment to get more errors. The errors marked as strict are more prone to be wrong, but should be more accurate as time goes on.
+
+You can also pass `--debug` or `-d` to get some debug information. Currently this isn't much, unless you hit a fatal error, in which case you might get some more info.
+
+By default, if you pass a directory or multiple file paths to the command, Phint will analyze all of them and spit out the errors as it goes along. If you pass `--exit-early` or `-e`, Phint will exit as soon as it finds a file with errors.
 
 ### Notes
 
 This tool makes some very heavy assumptions about how you're using it and your application.
 
-First of all, your project **must** use Composer's autoloader for every class and function being defined in the project.
+Your project **must** have some sort of autoloader register script present in `vendor/autoload.php`. This autoloader **must** make every class and function in your project available.
 
-Second, the checker works best if all the files being checked are classes with methods, nothing more.
-
-Third, the `phint` command **must** be ran from the project root for the autoloader to be picked up. If the autoloader isn't picked up, the checker can't reliably verify that other classes being referenced actually exist.
+The checker works best if all the files being checked are classes with methods, nothing more.
 
 ## Contributing
 
