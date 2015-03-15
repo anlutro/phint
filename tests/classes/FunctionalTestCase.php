@@ -21,6 +21,13 @@ abstract class FunctionalTestCase extends PHPUnit_Framework_TestCase
 
 	protected function makeChecker()
 	{
+		if (!defined('PHINT_DEBUG')) {
+			define('PHINT_DEBUG', true);
+		}
+		if (!defined('PHINT_STRICT')) {
+			define('PHINT_STRICT', true);
+		}
+
 		$checker = new Phint\Checker();
 		$checker->addDefaultVisitors();
 		return $checker;

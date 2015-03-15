@@ -27,7 +27,17 @@ class ConsoleRunner
 		$flags = $this->extractFlags($input);
 		$paths = $this->getPaths($input);
 
+		if (!defined('PHINT_DEBUG')) {
+			define('PHINT_DEBUG', false);
+		}
+		if (!defined('PHINT_STRICT')) {
+			define('PHINT_STRICT', false);
+		}
+
 		foreach ($paths as $path) {
+			if (PHINT_DEBUG) {
+				echo "Checking $path\n";
+			}
 			$result = $this->check($path);
 			if (!$result && $this->exitEarly) {
 				break;

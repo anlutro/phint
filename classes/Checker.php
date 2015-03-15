@@ -106,10 +106,6 @@ class Checker
 			define('PHINT_STRICT', false);
 		}
 
-		if (PHINT_DEBUG) {
-			echo "Checking $path\n";
-		}
-
 		$this->errors->clear();
 		$code = file_get_contents($path);
 		$nodes = $this->parser->parse($code);
