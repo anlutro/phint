@@ -52,20 +52,24 @@ class FunctionCallVisitor extends AbstractNodeVisitor implements NodeVisitorInte
 		$refl = new ReflectionFunction($func);
 		$params = $refl->getParameters();
 
-		// verify number of arguments
-		if (count($node->args) > count($params)) {
-			// cannot error on this as php functions can use func_get_args()
-		}
-
-		$requiredParams = 0;
-		foreach ($params as $param) {
-			if ($param->isOptional() || $param->isDefaultValueAvailable()) {
-				break;
+		// it's not possible to check for default values/optionalness etc. on
+		// internal functions
+		if (! $refl->isInternal()) {
+			// verify number of arguments
+			if (count($node->args) > count($params)) {
+				// cannot error on this as php functions can use func_get_args()
 			}
-			$requiredParams++;
-		}
-		if (count($node->args) < $requiredParams) {
-			$this->addError($this->createNotEnoughParamsError($node, $func, $requiredParams));
+
+			$requiredParams = 0;
+			foreach ($params as $param) {
+				if ($param->isOptional() || $param->isDefaultValueAvailable()) {
+					break;
+				}
+				$requiredParams++;
+			}
+			if (count($node->args) < $requiredParams) {
+				$this->addError($this->createNotEnoughParamsError($node, $func, $requiredParams));
+			}
 		}
 
 		// look for function parameters passed by reference

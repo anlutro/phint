@@ -1,19 +1,19 @@
 <?php
 namespace Phint\Chain;
 
+use Phint\Context\FileContext;
 use Phint\ContextWrapper;
+use Phint\DocblockParser;
 use Phint\Error;
 use Phint\ErrorBag;
-use Phint\DocblockParser;
 use Phint\VisitorCollection;
-use Phint\Context\FileContext;
-use PhpParser\Parser;
 use PhpParser\Node;
-use PhpParser\Node\Expr\Variable;
-use PhpParser\Node\Expr\StaticCall;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\PropertyFetch;
+use PhpParser\Node\Expr\StaticCall;
+use PhpParser\Node\Expr\Variable;
+use PhpParser\Parser;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionProperty;
@@ -438,12 +438,18 @@ class Chain
 
 	private function addUndeterminableVariableTypeError(Variable $node)
 	{
+		if (!PHINT_STRICT) {
+			return;
+		}
 		$msg = "Cannot determine type of variable \${$node->name}";
 		$this->errors->add(new Error($msg, $node));
 	}
 
 	private function addUndeterminableTypeError(Node $node, $class)
 	{
+		if (!PHINT_STRICT) {
+			return;
+		}
 		if ($node instanceof MethodCall) {
 			$typeName = 'return value type';
 			$nodeString = "method {$class}::{$node->name}()";
