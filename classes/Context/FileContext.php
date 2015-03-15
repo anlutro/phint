@@ -62,7 +62,7 @@ class FileContext
 	 *
 	 * @param ReflectionClass $reflectionClass
 	 */
-	public function setReflectionClass(ReflectionClass $reflectionClass)
+	public function setReflectionClass(ReflectionClass $reflectionClass = null)
 	{
 		$this->reflectionClass = $reflectionClass;
 	}

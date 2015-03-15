@@ -10,7 +10,7 @@ class FunctionContext
 	protected $reflectionFunction;
 	protected $functionNode;
 
-	public function setReflectionFunction(ReflectionFunctionAbstract $reflectionFunction)
+	public function setReflectionFunction(ReflectionFunctionAbstract $reflectionFunction = null)
 	{
 		$this->reflectionFunction = $reflectionFunction;
 	}

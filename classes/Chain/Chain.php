@@ -18,14 +18,23 @@ class Chain
 {
 	protected static $externalFileContexts = [];
 
+	/** @var Parser */
 	protected $parser;
+	/** @var VisitorCollection */
 	protected $visitors;
+	/** @var ContextWrapper */
 	protected $context;
+	/** @var ErrorBag */
 	protected $errors;
+	/** @var array */
 	protected $links;
+	/** @var Node */
 	protected $currentLink;
+	/** @var string[] */
 	protected $currentType;
+	/** @var \ReflectionClass[] */
 	protected $currentReflClass;
+	/** @var boolean */
 	protected $isLastLink = false;
 
 	public function __construct(
@@ -58,12 +67,11 @@ class Chain
 			return false;
 		}
 
-		return $this->getCurrentType();
+		return true;
 	}
 
 	private function checkInitialNode(Node $node)
 	{
-		// var_dump($node);
 		$this->currentLink = $node;
 
 		if ($node instanceof Variable) {
@@ -162,7 +170,8 @@ class Chain
 		$types = explode('|', $type);
 		$finalTypes = [];
 		foreach ($types as $type) {
-			if (\Phint\Context\Variable::isClassType($type)) {
+			$typeWithoutArray = str_replace('[]', '', $type);
+			if (\Phint\Context\Variable::isClassType($typeWithoutArray)) {
 				if ($file != $this->context->getFileName()) {
 					$context = $this->getExternalFileContext($file);
 					$type = $context->getClassName($type);
@@ -193,13 +202,13 @@ class Chain
 		$reflClass = [];
 		foreach ($types as $key => $type) {
 			$arrayOf = (substr($type, -2) == '[]');
+			$typeWithoutArray = str_replace('[]', '', $type);
 
-			if (\Phint\Context\Variable::isClassType($type)) {
-				$typeClass = $arrayOf ? substr($type, 0, -2) : $type;
-				if (!$this->classExists($typeClass)) {
+			if (\Phint\Context\Variable::isClassType($typeWithoutArray)) {
+				if (!$this->classExists($typeWithoutArray)) {
 					$currentClass = $this->getCurrentReflectionClass();
 					$currentClass = $currentClass ? $currentClass->getName() : null;
-					$this->addClassNotFoundError($typeClass, $currentClass,
+					$this->addClassNotFoundError($typeWithoutArray, $currentClass,
 						$this->currentLink);
 					return false;
 				}
@@ -219,6 +228,13 @@ class Chain
 		return class_exists($className) || interface_exists($className);
 	}
 
+	/**
+	 * Get a visitor.
+	 *
+	 * @param  string $visitor
+	 *
+	 * @return \Phint\NodeVisitorInterface|null
+	 */
 	private function getVisitor($visitor)
 	{
 		return $this->visitors->getVisitor('Phint\\Visitors\\'.$visitor);
@@ -317,13 +333,16 @@ class Chain
 		return $this->updateType($type);
 	}
 
-	private function getCurrentType()
+	public function getCurrentType()
 	{
 		return count($this->currentType) > 1 || !$this->currentType
 			? $this->currentType : $this->currentType[0];
 	}
 
-	private function getCurrentReflectionClass()
+	/**
+	 * @return \ReflectionClass|\ReflectionClass[]|null
+	 */
+	public function getCurrentReflectionClass()
 	{
 		return count($this->currentReflClass) > 1 || !$this->currentReflClass
 			? $this->currentReflClass : $this->currentReflClass[0];
@@ -393,7 +412,7 @@ class Chain
 			var_dump(__METHOD__.':'.__LINE__);
 			var_dump($node); die();
 		}
-		$msg = "Undeterminable $typeName of $nodeString";
+		$msg = "Cannot determine $typeName of $nodeString";
 		$this->errors->add(new Error($msg, $node));
 	}
 }

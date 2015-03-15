@@ -44,17 +44,22 @@ class Checker
 		$this->parser = $parser ?: new Parser(new Lexer);
 		$this->context = $context ?: new ContextWrapper();
 		$this->errors = $errors ?: new ErrorBag();
-		$visitorCollection = new VisitorCollection();
-		$chainFactory = new ChainFactory($this->parser, $visitorCollection,
-			$this->context, $this->errors);
-		$this->traverser = $traverser ?: new NodeTraverser(
-			$visitorCollection, $chainFactory);
+		$this->traverser = $traverser ?: new NodeTraverser();
 	}
 
-	public function addVisitor($visitor)
+	public function makeChainFactory()
+	{
+		$visitorCollection = $this->traverser->getVisitorCollection();
+		return new ChainFactory($this->parser, $visitorCollection,
+			$this->context, $this->errors);
+	}
+
+	public function addVisitor($visitor, array $args = [])
 	{
 		if (is_string($visitor)) {
-			$visitor = new $visitor($this->traverser, $this->context, $this->errors);
+			$args = array_merge([$this->traverser, $this->context, $this->errors], $args);
+			$refl = new \ReflectionClass($visitor);
+			$visitor = $refl->newInstanceArgs($args);
 		}
 		if (! $visitor instanceof NodeVisitorInterface) {
 			throw new \InvalidArgumentException('Visitor must be instance of NodeVisitorInterface');
@@ -76,9 +81,7 @@ class Checker
 		$this->addVisitor('Phint\Visitors\TernaryVisitor');
 		$this->addVisitor('Phint\Visitors\InstanceofVisitor');
 		$this->addVisitor('Phint\Visitors\StringWithVariableVisitor');
-		$this->addVisitor('Phint\Visitors\ObjectPropertyVisitor');
 		$this->addVisitor('Phint\Visitors\StaticMethodCallVisitor');
-		$this->addVisitor('Phint\Visitors\MethodCallVisitor');
 		$this->addVisitor('Phint\Visitors\NewVisitor');
 		$this->addVisitor('Phint\Visitors\FunctionCallVisitor');
 		$this->addVisitor('Phint\Visitors\ReturnVisitor');
@@ -89,6 +92,9 @@ class Checker
 		$this->addVisitor('Phint\Visitors\TryCatchVisitor');
 		$this->addVisitor('Phint\Visitors\SwitchVisitor');
 		$this->addVisitor('Phint\Visitors\ClosureVisitor');
+
+		// these visitors should be considered to be made optional
+		$this->addVisitor('Phint\Visitors\ChainVisitor', [$this->makeChainFactory()]);
 	}
 
 	public function check($path)

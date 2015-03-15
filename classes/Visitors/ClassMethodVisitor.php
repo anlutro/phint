@@ -40,6 +40,8 @@ class ClassMethodVisitor extends AbstractNodeVisitor implements NodeVisitorInter
 		if (!$node->isAbstract()) {
 			$this->recurse($node->stmts);
 		}
+
+		$ctx->setReflectionFunction(null);
 	}
 
 	private function classExists($className)

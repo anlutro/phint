@@ -127,7 +127,7 @@ class ContextWrapper
 		$this->funcContext->resetVariables();
 	}
 
-	public function setReflectionFunction(ReflectionFunctionAbstract $reflFunc)
+	public function setReflectionFunction(ReflectionFunctionAbstract $reflFunc = null)
 	{
 		$this->funcContext->setReflectionFunction($reflFunc);
 	}
@@ -160,7 +160,7 @@ class ContextWrapper
 		return $this->fileContext->getClassNode();
 	}
 
-	public function setReflectionClass(ReflectionClass $reflClass)
+	public function setReflectionClass(ReflectionClass $reflClass = null)
 	{
 		$this->fileContext->setReflectionClass($reflClass);
 	}
@@ -188,6 +188,11 @@ class ContextWrapper
 		$this->fileContext->import($className, $alias);
 	}
 
+	/**
+	 * @param  string $className
+	 *
+	 * @return string
+	 */
 	public function getClassName($className)
 	{
 		return $this->fileContext->getClassName($className);

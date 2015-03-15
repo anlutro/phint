@@ -8,17 +8,13 @@
 Phint is a static code analysis tool for PHP. Very much a work in progress. Currently checks for:
 
 - Undefined variables
-- Properties/methods being called on `$this` exist
-- Classes being used in your code actually exist (includes instantiation, parameter type-hinting, `instanceof` and `use` imports)
+- Properties/methods being called exist
+- Classes being used in your code exist (instantiation, type-hinting, `instanceof`)
 - Exception being caught actually exist and are exceptions (`catch (stdClass $e)` will error, for example)
 - Functions being called actually exist
+- Methods and functions are called with the correct number of arguments
 
-Features on the roadmap:
-
-- Validate property/method calls on non-`$this` objects
-- Verify that arguments with the right types are passed to function/method calls
-
-More features to come.
+More features to come. Check the Github issues.
 
 ## Installation and usage
 

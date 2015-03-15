@@ -34,22 +34,21 @@ class IfVisitor extends AbstractNodeVisitor implements NodeVisitorInterface
 		$instanceofs = $this->findInstanceofs($node->cond);
 
 		if ($instanceofs) {
-			$newContext = $this->cloneContext();
+			$ctx = $this->getContext();
 			foreach ($instanceofs as $instanceof) {
 				if (
 					$instanceof->expr instanceof Variable &&
 					$instanceof->class instanceof Name
 				) {
-					$var = $newContext->getVariable($instanceof->expr->name);
+					$var = $ctx->getVariable($instanceof->expr->name);
 					$var = new \Phint\Context\Variable($var->getNode(),
-						$this->getContext()->getClassName($instanceof->class));
-					$newContext->setVariable($instanceof->expr->name, $var);
+						$ctx->getClassName($instanceof->class));
+					$ctx->setVariable($instanceof->expr->name, $var);
 				}
 			}
-			$this->recurseWithNewContext($newContext, $node->stmts);
-		} else {
-			$this->recurse($node->stmts);
 		}
+
+		$this->recurse($node->stmts);
 	}
 
 	public function findInstanceofs($cond)

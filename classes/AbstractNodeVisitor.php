@@ -46,6 +46,14 @@ abstract class AbstractNodeVisitor
 	}
 
 	/**
+	 * @return NodeTraverser
+	 */
+	protected function getTraverser()
+	{
+		return $this->traverser;
+	}
+
+	/**
 	 * Clone the current function context.
 	 *
 	 * @return Context\FunctionContext
@@ -80,6 +88,10 @@ abstract class AbstractNodeVisitor
 
 	protected function traverseVariableChain(Node $node)
 	{
-		return $this->traverser->traverseVariableChain($node);
+		$visitor = $this->traverser->getVisitor('Phint\Visitors\ChainVisitor');
+
+		if ($visitor) {
+			return $visitor->visit($node);
+		}
 	}
 }

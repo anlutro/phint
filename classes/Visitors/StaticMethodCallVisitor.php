@@ -2,6 +2,7 @@
 namespace Phint\Visitors;
 
 use Phint\AbstractNodeVisitor;
+use Phint\Error;
 use Phint\NodeVisitorInterface;
 use PhpParser\Node;
 use PhpParser\Node\Expr\StaticCall;

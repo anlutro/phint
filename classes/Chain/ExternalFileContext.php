@@ -5,8 +5,11 @@ use Phint\Context\ImportBag;
 
 class ExternalFileContext
 {
+	/** @var ImportBag */
 	protected $imports;
+	/** @var string */
 	protected $namespace;
+	/** @var string */
 	protected $class;
 
 	public function __construct(array $nodes)

@@ -13,18 +13,14 @@ class NodeTraverser
 	 */
 	protected $visitors;
 
-	/**
-	 * The chain factory.
-	 *
-	 * @var ChainFactory
-	 */
-	protected $chainFactory;
-
-	public function __construct(VisitorCollection $visitors,
-		ChainFactory $chainFactory)
+	public function __construct(VisitorCollection $visitors = null)
 	{
-		$this->visitors = $visitors;
-		$this->chainFactory = $chainFactory;
+		$this->visitors = $visitors ?: new VisitorCollection;
+	}
+
+	public function getVisitorCollection()
+	{
+		return $this->visitors;
 	}
 
 	public function addVisitor(NodeVisitorInterface $visitor)
@@ -56,11 +52,5 @@ class NodeTraverser
 				$visitor->visit($node);
 			}
 		}
-	}
-
-	public function traverseVariableChain(Node $node)
-	{
-		$chain = $this->chainFactory->create($node);
-		return $chain->check();
 	}
 }
