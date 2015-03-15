@@ -27,6 +27,13 @@ class Variable
 	protected static $nonClassTypes = ['mixed', 'null', 'void', 'string', 'int',
 		'integer', 'float', 'double', 'bool', 'boolean', 'array', 'object'];
 
+	/**
+	 * Determine if a type is a class type.
+	 *
+	 * @param  string  $type
+	 *
+	 * @return boolean
+	 */
 	public static function isClassType($type)
 	{
 		return ! in_array($type, static::$nonClassTypes, true);

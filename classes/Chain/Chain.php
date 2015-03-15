@@ -14,6 +14,9 @@ use PhpParser\Node\Expr\StaticCall;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\PropertyFetch;
+use ReflectionClass;
+use ReflectionMethod;
+use ReflectionProperty;
 
 class Chain
 {
@@ -33,7 +36,7 @@ class Chain
 	protected $currentLink;
 	/** @var string[] */
 	protected $currentType;
-	/** @var \ReflectionClass[] */
+	/** @var ReflectionClass[] */
 	protected $currentReflClass;
 	/** @var boolean */
 	protected $isLastLink = false;
@@ -115,7 +118,7 @@ class Chain
 	private function getStaticMethodCallType(StaticCall $node)
 	{
 		$className = $this->context->getClassName($node->class);
-		$reflClass = new \ReflectionClass($className);
+		$reflClass = new ReflectionClass($className);
 
 		if (!$reflClass->hasMethod($node->name)) {
 			if (!$reflClass->hasMethod('__callStatic')) {
@@ -125,7 +128,10 @@ class Chain
 		}
 
 		$reflMethod = $reflClass->getMethod($node->name);
-		if (!$reflMethod->isStatic()) {
+		if (
+			! $reflMethod->isStatic() &&
+			! $reflMethod->isConstructor()
+		) {
 			if (!$reflClass->hasMethod('__callStatic')) {
 				$this->addStaticCallNonStaticMethodError($node, $className, $node->name);
 			}
@@ -135,9 +141,9 @@ class Chain
 		$type = $this->getReflectionType($reflMethod);
 
 		if (!$type) {
+			// don't add an error if we're at the last link. the error may be
+			// recoverable or insignificant
 			if (!$this->isLastLink) {
-				$className = $this->getCurrentReflectionClass()
-					->getName();
 				$this->addUndeterminableTypeError($node, $className);
 			}
 			return false;
@@ -148,15 +154,23 @@ class Chain
 
 	private function getReflectionType($reflector)
 	{
+		if (
+			$reflector instanceof ReflectionMethod &&
+			$reflector->isConstructor()
+		) {
+			$className = $reflector->getDeclaringClass()->getName();
+			return [$className];
+		}
+
 		$docstr = $reflector->getDocComment();
 		if (!$docstr) {
 			return false;
 		}
 
-		if ($reflector instanceof \ReflectionMethod) {
+		if ($reflector instanceof ReflectionMethod) {
 			$file = $reflector->getFileName();
 			$type = DocblockParser::getMethodType($docstr);
-		} elseif ($reflector instanceof \ReflectionProperty) {
+		} elseif ($reflector instanceof ReflectionProperty) {
 			$file = $reflector->getDeclaringClass()->getFileName();
 			$type = DocblockParser::getPropertyType($docstr);
 		} else {
@@ -219,7 +233,7 @@ class Chain
 					return false;
 				}
 				if (!$arrayOf) {
-					$reflClass[] = new \ReflectionClass($type);
+					$reflClass[] = new ReflectionClass($type);
 				}
 			}
 		}
@@ -269,6 +283,8 @@ class Chain
 			return $this->checkMethodCall($link);
 		} elseif ($link instanceof PropertyFetch) {
 			return $this->checkPropertyFetch($link);
+		} elseif ($link instanceof StaticCall) {
+			return $this->getStaticMethodCallType($link);
 		} else {
 			var_dump(__METHOD__.':'.__LINE__);
 			var_dump($link); die();
@@ -346,7 +362,7 @@ class Chain
 	}
 
 	/**
-	 * @return \ReflectionClass|\ReflectionClass[]|null
+	 * @return ReflectionClass|ReflectionClass[]|null
 	 */
 	public function getCurrentReflectionClass()
 	{
@@ -411,6 +427,9 @@ class Chain
 		if ($node instanceof MethodCall) {
 			$typeName = 'return value type';
 			$nodeString = "method {$class}::{$node->name}()";
+		} elseif ($node instanceof StaticCall) {
+			$typeName = 'return value type';
+			$nodeString = "static method {$class}::{$node->name}()";
 		} elseif ($node instanceof PropertyFetch) {
 			$typeName = 'type';
 			$nodeString = "property {$class}::\${$node->name}";

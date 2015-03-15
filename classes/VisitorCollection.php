@@ -7,7 +7,13 @@ class VisitorCollection
 
 	public function addVisitor(NodeVisitorInterface $visitor)
 	{
-		$this->visitors[get_class($visitor)] = $visitor;
+		$class = get_class($visitor);
+
+		if (isset($this->visitors[$class])) {
+			return;
+		}
+
+		$this->visitors[$class] = $visitor;
 	}
 
 	public function removeVisitor($visitor)

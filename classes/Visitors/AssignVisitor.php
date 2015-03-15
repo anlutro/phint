@@ -10,6 +10,7 @@ use PhpParser\Node\Expr\Assign;
 use PhpParser\Node\Expr\AssignRef;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Expr\MethodCall;
+use PhpParser\Node\Expr\StaticCall;
 use PhpParser\Node\Expr\PropertyFetch;
 use PhpParser\Node\Expr\List_;
 
@@ -21,39 +22,25 @@ class AssignVisitor extends AbstractNodeVisitor implements NodeVisitorInterface
 			return;
 		}
 
-		if ($node->var instanceof PropertyFetch) {
-			if ($node->var->var->name == 'this' && ! $node->var->var->var) {
-				// property name is dynamic (variables/string concatenation)
-				if (!is_string($node->var->name)) {
-					return;
-				}
-
-				$reflClass = $this->getContext()
-					->getReflectionClass();
-				if (
-					! $reflClass->hasProperty($node->var->name) &&
-					! $reflClass->hasMethod('__set')
-				) {
-					$this->addError($this->createUndefinedPropertyError(
-						$node->var, $reflClass));
-				}
-			} else {
-				// TODO
-			}
-		}
-
 		$ctx = $this->getContext();
+
+		if ($node->var instanceof PropertyFetch) {
+			$this->traverseVariableChain($node->var);
+		}
 
 		if ($node->var instanceof List_) {
 			foreach ($node->var->vars as $var) {
 				if ($var instanceof Variable) {
 					$ctx->setVariable($var->name, $node->expr);
+				} elseif ($node->var instanceof PropertyFetch) {
+					$this->traverseVariableChain($node->var);
 				}
 			}
 		}
 
 		if (
 			$node->expr instanceof MethodCall ||
+			$node->expr instanceof StaticCall ||
 			$node->expr instanceof PropertyFetch
 		) {
 			$type = $this->traverseVariableChain($node->expr);

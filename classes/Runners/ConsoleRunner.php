@@ -8,6 +8,7 @@ class ConsoleRunner
 {
 	protected $finder;
 	protected $hasErrors = false;
+	protected $exitEarly = false;
 
 	public function __construct()
 	{
@@ -26,7 +27,10 @@ class ConsoleRunner
 		$paths = $this->getPaths($input);
 
 		foreach ($paths as $path) {
-			$this->check($path);
+			$result = $this->check($path);
+			if (!$result && $this->exitEarly) {
+				break;
+			}
 		}
 
 		if ($this->hasErrors) {
@@ -51,6 +55,10 @@ class ConsoleRunner
 		foreach ($inputs as $key => $input) {
 			if (strpos($input, '--exclude=') === 0) {
 				$excludes[] = substr($input, 10);
+				unset($inputs[$key]);
+			}
+			if (strpos($input, '--exit-early') !== false) {
+				$this->exitEarly = true;
 				unset($inputs[$key]);
 			}
 		}
@@ -108,6 +116,8 @@ class ConsoleRunner
 			}
 			$this->hasErrors = true;
 		}
+
+		return ! $this->hasErrors;
 	}
 
 	/**

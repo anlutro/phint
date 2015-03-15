@@ -15,9 +15,10 @@ class StaticMethodCallVisitor extends AbstractNodeVisitor implements NodeVisitor
 			return;
 		}
 
-		$className = $this->getContext()->getClassName($node->class);
+		$className = $this->getContext()
+			->getClassName($node->class);
 
-		if (!class_exists($className)) {
+		if ($className && !class_exists($className)) {
 			$this->addClassNotFoundError($className, $node);
 		}
 	}

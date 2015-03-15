@@ -64,6 +64,7 @@ class Checker
 		if (! $visitor instanceof NodeVisitorInterface) {
 			throw new \InvalidArgumentException('Visitor must be instance of NodeVisitorInterface');
 		}
+
 		$this->traverser->addVisitor($visitor);
 	}
 
@@ -81,7 +82,6 @@ class Checker
 		$this->addVisitor('Phint\Visitors\TernaryVisitor');
 		$this->addVisitor('Phint\Visitors\InstanceofVisitor');
 		$this->addVisitor('Phint\Visitors\StringWithVariableVisitor');
-		$this->addVisitor('Phint\Visitors\StaticMethodCallVisitor');
 		$this->addVisitor('Phint\Visitors\NewVisitor');
 		$this->addVisitor('Phint\Visitors\FunctionCallVisitor');
 		$this->addVisitor('Phint\Visitors\ReturnVisitor');

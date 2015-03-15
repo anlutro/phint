@@ -153,6 +153,11 @@ class FileContext
 			return $parentClass ? $parentClass->getName() : null;
 		}
 
+		// cannot determine classnames of expressions, as they are variable
+		if ($className instanceof \PhpParser\Node\Expr) {
+			return null;
+		}
+
 		if ('\\' == $className[0]) {
 			return ltrim($className, '\\');
 		}

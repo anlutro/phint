@@ -33,7 +33,9 @@ class ForeachVisitor extends AbstractNodeVisitor implements NodeVisitorInterface
 		if ($node->expr instanceof \PhpParser\Node\Expr\Variable) {
 			$var = $this->getContext()
 				->getVariable($node->expr->name);
-			$type = $var->getType();
+			if ($var) {
+				$type = $var->getType();
+			}
 		} elseif (
 			$node->expr instanceof \PhpParser\Node\Expr\MethodCall ||
 			$node->expr instanceof \PhpParser\Node\Expr\PropertyFetch

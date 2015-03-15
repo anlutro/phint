@@ -9,6 +9,7 @@ use Phint\ErrorBag;
 use Phint\Chain\ChainFactory;
 use PhpParser\Node;
 use PhpParser\Node\Expr\MethodCall;
+use PhpParser\Node\Expr\StaticCall;
 use PhpParser\Node\Expr\PropertyFetch;
 
 class ChainVisitor extends AbstractNodeVisitor implements NodeVisitorInterface
@@ -30,6 +31,7 @@ class ChainVisitor extends AbstractNodeVisitor implements NodeVisitorInterface
 	{
 		if (
 			! $node instanceof MethodCall &&
+			! $node instanceof StaticCall &&
 			! $node instanceof PropertyFetch
 		) {
 			return;

@@ -4,7 +4,11 @@ class NestedObjectOperationsTest extends FunctionalTestCase
 	/** @test */
 	public function generated_test()
 	{
-		$errors = $this->check(__DIR__.'/cases/NestedObjectOperationsCase.php');
+		$checker = $this->makeChecker();
+		$checker->addVisitor('Phint\Visitors\ChainVisitor', [$checker->makeChainFactory()]);
+		$checker->check(__DIR__.'/cases/NestedObjectOperationsCase.php');
+		$errors = $checker->getErrors();
+
 		$this->assertEquals(10, count($errors));
 		$this->assertEquals('26', $errors[0]->getLineNumber());
 		$this->assertEquals('Call to undefined method: One::one()', $errors[0]->getMessage());

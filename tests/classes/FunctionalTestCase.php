@@ -14,9 +14,15 @@ abstract class FunctionalTestCase extends PHPUnit_Framework_TestCase
 
 	protected function check($path)
 	{
-		$checker = new Phint\Checker();
-		$checker->addDefaultVisitors();
+		$checker = $this->makeChecker();
 		$checker->check($path);
 		return $checker->getErrors();
+	}
+
+	protected function makeChecker()
+	{
+		$checker = new Phint\Checker();
+		$checker->addDefaultVisitors();
+		return $checker;
 	}
 }
