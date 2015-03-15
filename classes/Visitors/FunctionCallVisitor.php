@@ -5,6 +5,7 @@ use Phint\AbstractNodeVisitor;
 use Phint\Error;
 use Phint\NodeVisitorInterface;
 use PhpParser\Node;
+use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Name;
@@ -25,7 +26,7 @@ class FunctionCallVisitor extends AbstractNodeVisitor implements NodeVisitorInte
 			$this->checkFunction($node->name, $node);
 		}
 
-		$argValues = array_map(function($arg) {
+		$argValues = array_map(function(Arg $arg) {
 			return $arg->value;
 		}, $node->args);
 		$this->recurse($argValues);
@@ -33,13 +34,16 @@ class FunctionCallVisitor extends AbstractNodeVisitor implements NodeVisitorInte
 
 	private function checkFunction(Name $name, FuncCall $node)
 	{
+		// check for a function inside the class namespace as well as imported
+		// functions first.
 		$func = $this->getContext()
 			->getClassName($name->toString());
-
 		if (!function_exists($func)) {
+			// get the plain function name without namespaces
 			$func = $name->toString();
 		}
 
+		// check if the function exists in the global namespace
 		if (!function_exists($func)) {
 			$this->addError($this->createUndefinedFunctionError($func, $node));
 			return;

@@ -106,6 +106,11 @@ class Checker
 		$this->traverser->traverse($nodes);
 	}
 
+	/**
+	 * Get the checker's errors.
+	 *
+	 * @return Error[]
+	 */
 	public function getErrors()
 	{
 		return $this->errors->getAll();

@@ -32,6 +32,8 @@ class IfVisitor extends AbstractNodeVisitor implements NodeVisitorInterface
 	{
 		$this->recurse($node->cond);
 		$instanceofs = $this->findInstanceofs($node->cond);
+		$oldVars = [];
+		$newVars = [];
 
 		if ($instanceofs) {
 			$ctx = $this->getContext();
@@ -40,15 +42,26 @@ class IfVisitor extends AbstractNodeVisitor implements NodeVisitorInterface
 					$instanceof->expr instanceof Variable &&
 					$instanceof->class instanceof Name
 				) {
-					$var = $ctx->getVariable($instanceof->expr->name);
-					$var = new \Phint\Context\Variable($var->getNode(),
+					$oldVar = $ctx->getVariable($instanceof->expr->name);
+					$oldVars[$instanceof->expr->name] = $oldVar;
+					$newVar = new \Phint\Context\Variable($oldVar->getNode(),
 						$ctx->getClassName($instanceof->class));
-					$ctx->setVariable($instanceof->expr->name, $var);
+					$newVars[$instanceof->expr->name] = $newVar;
+					$ctx->setVariable($instanceof->expr->name, $newVar);
 				}
 			}
 		}
 
 		$this->recurse($node->stmts);
+
+		foreach ($oldVars as $name => $var) {
+			// the variable may have changed inside the if block. if so, leave
+			// it alone. whether this is correct behaviour probably depends on a
+			// lot of factors.
+			if ($ctx->getVariable($name) === $newVars[$name]) {
+				$ctx->setVariable($name, $var);
+			}
+		}
 	}
 
 	public function findInstanceofs($cond)

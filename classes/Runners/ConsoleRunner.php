@@ -14,6 +14,13 @@ class ConsoleRunner
 		$this->finder = new Finder;
 	}
 
+	/**
+	 * Run the check.
+	 *
+	 * @param  string[]  $input
+	 *
+	 * @return int
+	 */
 	public function run(array $input)
 	{
 		$paths = $this->getPaths($input);
@@ -30,6 +37,11 @@ class ConsoleRunner
 		}
 	}
 
+	/**
+	 * @param  string[]  $inputs
+	 *
+	 * @return string[]
+	 */
 	private function getPaths(array $inputs)
 	{
 		$dirs = [];
@@ -98,6 +110,9 @@ class ConsoleRunner
 		}
 	}
 
+	/**
+	 * @return Checker
+	 */
 	private function makeChecker()
 	{
 		$checker = new Checker;

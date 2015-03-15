@@ -13,6 +13,7 @@ use PhpParser\Node\Expr\PropertyFetch;
 
 class ChainVisitor extends AbstractNodeVisitor implements NodeVisitorInterface
 {
+	/** @var ChainFactory */
 	protected $chainFactory;
 
 	public function __construct(

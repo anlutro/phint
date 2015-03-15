@@ -6,6 +6,7 @@ use Phint\Error;
 use Phint\ErrorBag;
 use Phint\DocblockParser;
 use Phint\VisitorCollection;
+use Phint\Context\FileContext;
 use PhpParser\Parser;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Variable;
@@ -186,11 +187,16 @@ class Chain
 		return $finalTypes;
 	}
 
+	/**
+	 * @param  string $file
+	 *
+	 * @return FileContext
+	 */
 	private function getExternalFileContext($file)
 	{
 		if (!isset(static::$externalFileContexts[$file])) {
 			$nodes = $this->parser->parse(file_get_contents($file));
-			$ctx = new ExternalFileContext($nodes);
+			$ctx = FileContext::createFromNodes($nodes);
 			static::$externalFileContexts[$file] = $ctx;
 		}
 

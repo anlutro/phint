@@ -33,6 +33,13 @@ class NodeTraverser
 		return $this->visitors->removeVisitor($visitor);
 	}
 
+	/**
+	 * Get a visitor.
+	 *
+	 * @param  string $visitor Full class name of the visitor.
+	 *
+	 * @return NodeVisitorInterface|null
+	 */
 	public function getVisitor($visitor)
 	{
 		return $this->visitors->getVisitor($visitor);

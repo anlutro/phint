@@ -2,19 +2,61 @@
 namespace Phint\Context;
 
 use ReflectionClass;
+use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_ as ClassNode;
 
 class FileContext
 {
+	/** @var string */
 	protected $filename;
+	/** @var string|null */
 	protected $namespace;
+	/** @var ImportBag */
 	protected $imports;
+	/** @var ClassNode|null */
 	protected $classNode;
+	/** @var ReflectionClass|null */
 	protected $reflectionClass;
 
 	public function __construct(ImportBag $imports = null)
 	{
 		$this->imports = $imports ?: new ImportBag;
+	}
+
+	/**
+	 * Create a new context instance from an array of nodes.
+	 *
+	 * @param  Node[]  $nodes
+	 *
+	 * @return FileContext
+	 */
+	public static function createFromNodes(array $nodes)
+	{
+		$context = new static;
+		$context->scanNodes($nodes);
+		return $context;
+	}
+
+	protected function scanNodes(array $nodes)
+	{
+		foreach ($nodes as $node) {
+			if ($node instanceof \PhpParser\Node\Stmt\Namespace_) {
+				$this->namespace = (string) $node->name;
+				$this->scanNodes($node->stmts);
+			}
+
+			if ($node instanceof \PhpParser\Node\Stmt\Use_) {
+				foreach ($node->uses as $use) {
+					$this->imports->add($use->name->toString(), $use->alias);
+				}
+			}
+
+			if ($node instanceof \PhpParser\Node\Stmt\Class_) {
+				$this->classNode = $node;
+				$className = ($this->namespace ? $this->namespace.'\\' : '').$node->name;
+				$this->reflectionClass = new ReflectionClass($className);
+			}
+		}
 	}
 
 	public function getFileName()
@@ -104,6 +146,11 @@ class FileContext
 
 		if ($className == 'static' || $className == 'self') {
 			return $this->reflectionClass->getName();
+		}
+
+		if ($className == 'parent') {
+			$parentClass = $this->reflectionClass->getParentClass();
+			return $parentClass ? $parentClass->getName() : null;
 		}
 
 		if ('\\' == $className[0]) {
