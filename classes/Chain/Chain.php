@@ -182,23 +182,14 @@ class Chain
 			return null;
 		}
 
-		$types = explode('|', $type);
-		$finalTypes = [];
-		foreach ($types as $type) {
-			$typeWithoutArray = str_replace('[]', '', $type);
-			if (\Phint\Context\Variable::isClassType($typeWithoutArray)) {
-				if ($file != $this->context->getFileName()) {
-					$context = $this->getExternalFileContext($file);
-					$type = $context->getClassName($type);
-				} else {
-					$type = $this->context->getClassName($type);
-				}
-			}
-
-			$finalTypes[] = $type;
+		if ($file == $this->context->getFileName()) {
+			$context = $this->context;
+		} else {
+			$context = $this->getExternalFileContext($file);
 		}
+		$types = $context->parseDocblockType($type);
 
-		return $finalTypes;
+		return $types;
 	}
 
 	/**
@@ -386,7 +377,8 @@ class Chain
 			$nodeName = 'Property '.$className.'::$'.$node->name;
 		} else {
 			var_dump(__METHOD__.':'.__LINE__);
-			var_dump($node); die();
+			var_dump($node, $className, $type);
+			throw new \Exception;
 		}
 		$msg = "$nodeName is type-hinted against a non-existant class: $type";
 		$this->errors->add(new Error($msg, $node));

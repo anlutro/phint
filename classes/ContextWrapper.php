@@ -70,8 +70,8 @@ class ContextWrapper
 
 			if (isset($docblock) && $docblock) {
 				$type = DocblockParser::getParamType($docblock, $node->name);
-				if (Variable::isClassType($type)) {
-					$type = $this->getClassName($type);
+				if ($type) {
+					$type = $this->parseDocblockType($type);
 				}
 			}
 
@@ -103,6 +103,11 @@ class ContextWrapper
 		if ($node instanceof \PhpParser\Node\Scalar\LNumber) {
 			return 'integer';
 		}
+	}
+
+	public function parseDocblockType($type)
+	{
+		return $this->fileContext->parseDocblockType($type);
 	}
 
 	public function unsetVariable($name)

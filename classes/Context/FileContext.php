@@ -144,6 +144,10 @@ class FileContext
 			$className = $className->toString();
 		}
 
+		if (!$className) {
+			throw new \InvalidArgumentException('$className cannot be empty');
+		}
+
 		if ($className == 'static' || $className == 'self') {
 			return $this->reflectionClass->getName();
 		}
@@ -167,5 +171,26 @@ class FileContext
 		}
 
 		return ($this->namespace ? $this->namespace.'\\' : '').$className;
+	}
+
+	public function parseDocblockType($type)
+	{
+		$types = explode('|', $type);
+		$finalTypes = [];
+
+		foreach ($types as $type) {
+			$isArray = strpos($type, '[]') !== false;
+			$typeWithoutArray = str_replace('[]', '', $type);
+			if (\Phint\Context\Variable::isClassType($typeWithoutArray)) {
+				$type = $this->getClassName($typeWithoutArray);
+				if ($isArray) {
+					$type .= '[]';
+				}
+			}
+
+			$finalTypes[] = $type;
+		}
+
+		return $finalTypes;
 	}
 }
