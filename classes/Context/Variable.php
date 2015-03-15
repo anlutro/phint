@@ -24,8 +24,9 @@ class Variable
 		return $this->type;
 	}
 
-	protected static $nonClassTypes = ['mixed', 'null', 'void', 'string', 'int',
-		'integer', 'float', 'double', 'bool', 'boolean', 'array', 'object'];
+	protected static $nonClassTypes = ['mixed', 'void',
+		'null', 'string', 'int', 'integer', 'float', 'double', 'bool', 'boolean',
+		'array', 'object', 'resource'];
 
 	/**
 	 * Determine if a type is a class type.

@@ -9,12 +9,19 @@ class FileContext
 {
 	/** @var string */
 	protected $filename;
+
+	/** @var array */
+	protected $lines;
+
 	/** @var string|null */
 	protected $namespace;
+
 	/** @var ImportBag */
 	protected $imports;
+
 	/** @var ClassNode|null */
 	protected $classNode;
+
 	/** @var ReflectionClass|null */
 	protected $reflectionClass;
 

@@ -99,6 +99,17 @@ class Checker
 
 	public function check($path)
 	{
+		if (!defined('PHINT_DEBUG')) {
+			define('PHINT_DEBUG', false);
+		}
+		if (!defined('PHINT_STRICT')) {
+			define('PHINT_STRICT', false);
+		}
+
+		if (PHINT_DEBUG) {
+			echo "Checking $path\n";
+		}
+
 		$this->errors->clear();
 		$code = file_get_contents($path);
 		$nodes = $this->parser->parse($code);

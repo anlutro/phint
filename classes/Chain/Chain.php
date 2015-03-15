@@ -57,6 +57,9 @@ class Chain
 
 	public function check()
 	{
+		if (count($this->links) == 1) {
+			$this->isLastLink = true;
+		}
 		if ($this->checkInitialNode($this->links[0]) === false) {
 			return false;
 		}
@@ -108,8 +111,12 @@ class Chain
 		} elseif ($node instanceof FuncCall) {
 			die("TODO: Not yet implemented\n");
 		} else {
-			var_dump(__METHOD__.':'.__LINE__);
-			var_dump($node); die();
+			if (PHINT_DEBUG) {
+				var_dump(__METHOD__.':'.__LINE__);
+				var_dump($node);
+				throw new \RuntimeException;
+			}
+			return false;
 		}
 
 		return $this->updateType($type);
@@ -117,6 +124,10 @@ class Chain
 
 	private function getStaticMethodCallType(StaticCall $node)
 	{
+		if ($node->class instanceof \PhpParser\Node\Expr) {
+			return false;
+		}
+
 		$className = $this->context->getClassName($node->class);
 		$reflClass = new ReflectionClass($className);
 
@@ -130,7 +141,8 @@ class Chain
 		$reflMethod = $reflClass->getMethod($node->name);
 		if (
 			! $reflMethod->isStatic() &&
-			! $reflMethod->isConstructor()
+			! $reflMethod->isConstructor() &&
+			$node->class != 'parent'
 		) {
 			if (!$reflClass->hasMethod('__callStatic')) {
 				$this->addStaticCallNonStaticMethodError($node, $className, $node->name);
@@ -174,8 +186,12 @@ class Chain
 			$file = $reflector->getDeclaringClass()->getFileName();
 			$type = DocblockParser::getPropertyType($docstr);
 		} else {
-			var_dump(__METHOD__.':'.__LINE__);
-			var_dump($reflector); die();
+			if (PHINT_DEBUG) {
+				var_dump(__METHOD__.':'.__LINE__);
+				var_dump($reflector);
+				throw new \RuntimeException;
+			}
+			return null;
 		}
 
 		if (!$type) {
@@ -269,7 +285,12 @@ class Chain
 	private function checkLink(Node $link)
 	{
 		$this->currentLink = $link;
-		
+
+		if ($link->name instanceof \PhpParser\Node\Expr) {
+			$this->updateType(['mixed']);
+			return true;
+		}
+
 		if ($link instanceof MethodCall) {
 			return $this->checkMethodCall($link);
 		} elseif ($link instanceof PropertyFetch) {
@@ -277,8 +298,12 @@ class Chain
 		} elseif ($link instanceof StaticCall) {
 			return $this->getStaticMethodCallType($link);
 		} else {
-			var_dump(__METHOD__.':'.__LINE__);
-			var_dump($link); die();
+			if (PHINT_DEBUG) {
+				var_dump(__METHOD__.':'.__LINE__);
+				var_dump($link);
+				throw new \RuntimeException;
+			}
+			return false;
 		}
 
 		return true;
@@ -376,9 +401,12 @@ class Chain
 		} elseif ($node instanceof PropertyFetch) {
 			$nodeName = 'Property '.$className.'::$'.$node->name;
 		} else {
-			var_dump(__METHOD__.':'.__LINE__);
-			var_dump($node, $className, $type);
-			throw new \Exception;
+			if (PHINT_DEBUG) {
+				var_dump(__METHOD__.':'.__LINE__);
+				var_dump($node, $className, $type);
+				throw new \RuntimeException;
+			}
+			return;
 		}
 		$msg = "$nodeName is type-hinted against a non-existant class: $type";
 		$this->errors->add(new Error($msg, $node));
@@ -426,8 +454,11 @@ class Chain
 			$typeName = 'type';
 			$nodeString = "property {$class}::\${$node->name}";
 		} else {
-			var_dump(__METHOD__.':'.__LINE__);
-			var_dump($node); die();
+			if (PHINT_DEBUG) {
+				var_dump(__METHOD__.':'.__LINE__);
+				var_dump($node);
+				throw new \RuntimeException;
+			}
 		}
 		$msg = "Cannot determine $typeName of $nodeString";
 		$this->errors->add(new Error($msg, $node));

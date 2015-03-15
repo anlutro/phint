@@ -24,6 +24,7 @@ class ConsoleRunner
 	 */
 	public function run(array $input)
 	{
+		$flags = $this->extractFlags($input);
 		$paths = $this->getPaths($input);
 
 		foreach ($paths as $path) {
@@ -38,6 +39,38 @@ class ConsoleRunner
 		} else {
 			echo "No errors found!\n";
 			return 0;
+		}
+	}
+
+	private function extractFlags(array &$inputs)
+	{
+		$flags = [];
+
+		foreach ($inputs as $key => $input) {
+			preg_match('/(\-\-[a-z\-]+|\-[a-z])/', $input, $matches);
+			if ($matches) {
+				$flags[] = $matches[1];
+				unset($inputs[$key]);
+			}
+		}
+
+		foreach ($flags as $flag) {
+			switch ($flag) {
+				case '-e':
+				case '--exit-early':
+					$this->exitEarly = true;
+					break;
+				case '-s':
+				case '--strict':
+					define('PHINT_STRICT', true);
+					break;
+				case '-d':
+				case '--debug':
+					define('PHINT_DEBUG', true);
+					break;
+				default:
+					break;
+			}
 		}
 	}
 
@@ -57,10 +90,10 @@ class ConsoleRunner
 				$excludes[] = substr($input, 10);
 				unset($inputs[$key]);
 			}
-			if (strpos($input, '--exit-early') !== false) {
-				$this->exitEarly = true;
-				unset($inputs[$key]);
-			}
+		}
+
+		if (!$inputs) {
+			throw new \InvalidArgumentException("No paths given");
 		}
 
 		foreach ($inputs as $input) {
@@ -77,6 +110,7 @@ class ConsoleRunner
 			$finder = Finder::create()
 				->files()
 				->name('*.php')
+				->exclude($excludes)
 				->in($dirs);
 
 			foreach ($finder as $file) {
