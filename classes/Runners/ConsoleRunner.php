@@ -3,6 +3,7 @@ namespace Phint\Runners;
 
 class ConsoleRunner extends AbstractRunner
 {
+	protected $cwd;
 	protected $hasErrors = false;
 	protected $exitEarly = false;
 
@@ -15,9 +16,10 @@ class ConsoleRunner extends AbstractRunner
 	 */
 	public function run(array $input)
 	{
-		$this->findAndLoadAutoloader();
+		$this->extractFlags($input);
 
-		$flags = $this->extractFlags($input);
+		$this->findAndLoadAutoloader($this->cwd);
+
 		$paths = $this->getPaths($input);
 
 		if (!defined('PHINT_DEBUG')) {
@@ -70,6 +72,9 @@ class ConsoleRunner extends AbstractRunner
 				case '--debug':
 					define('PHINT_DEBUG', true);
 					break;
+				case '-p':
+				case '--path':
+					$this->cwd = $match[3];
 				default:
 					break;
 			}

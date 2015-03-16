@@ -2,6 +2,7 @@
 namespace Phint\Runners;
 
 use Phint\Checker;
+use Phint\PhintException;
 use Symfony\Component\Finder\Finder;
 
 abstract class AbstractRunner
