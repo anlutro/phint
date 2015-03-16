@@ -128,6 +128,15 @@ class Chain
 			return false;
 		}
 
+		if (! $this->currentReflClass && (
+			$node->class == 'static' ||
+			$node->class == 'self' ||
+			$node->class == 'parent'
+		)) {
+			$this->errors->add(new Error("Cannot call $node->class:: outside of class context", $node));
+			return false;
+		}
+
 		$className = $this->context->getClassName($node->class);
 		$reflClass = new ReflectionClass($className);
 
