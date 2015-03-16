@@ -127,9 +127,9 @@ class ContextWrapper
 		return $this->funcContext->getVariable($name);
 	}
 
-	public function resetVariables()
+	public function resetVariables($preserveThis = true)
 	{
-		$this->funcContext->resetVariables();
+		$this->funcContext->resetVariables($preserveThis);
 	}
 
 	public function setReflectionFunction(ReflectionFunctionAbstract $reflFunc = null)

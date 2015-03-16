@@ -72,6 +72,7 @@ class Checker
 	{
 		$this->addVisitor('Phint\Visitors\NamespaceVisitor');
 		$this->addVisitor('Phint\Visitors\UseVisitor');
+		$this->addVisitor('Phint\Visitors\FunctionVisitor');
 		$this->addVisitor('Phint\Visitors\ClassVisitor');
 		$this->addVisitor('Phint\Visitors\ClassMethodVisitor');
 		$this->addVisitor('Phint\Visitors\VariableVisitor');

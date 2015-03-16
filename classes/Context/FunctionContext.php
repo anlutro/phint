@@ -55,9 +55,9 @@ class FunctionContext
 		return isset($this->variables[$name]) ? $this->variables[$name] : null;
 	}
 
-	public function resetVariables()
+	public function resetVariables($preserveThis = true)
 	{
-		if (isset($this->variables['this'])) {
+		if ($preserveThis && isset($this->variables['this'])) {
 			$thisVar = $this->variables['this'];
 			$this->variables = ['this' => $thisVar];
 		} else {
