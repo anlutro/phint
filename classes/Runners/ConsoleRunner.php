@@ -1,19 +1,10 @@
 <?php
 namespace Phint\Runners;
 
-use Phint\Checker;
-use Symfony\Component\Finder\Finder;
-
-class ConsoleRunner
+class ConsoleRunner extends AbstractRunner
 {
-	protected $finder;
 	protected $hasErrors = false;
 	protected $exitEarly = false;
-
-	public function __construct()
-	{
-		$this->finder = new Finder;
-	}
 
 	/**
 	 * Run the check.
@@ -24,6 +15,8 @@ class ConsoleRunner
 	 */
 	public function run(array $input)
 	{
+		$this->findAndLoadAutoloader();
+
 		$flags = $this->extractFlags($input);
 		$paths = $this->getPaths($input);
 
@@ -52,20 +45,19 @@ class ConsoleRunner
 		}
 	}
 
-	private function extractFlags(array &$inputs)
+	protected function extractFlags(array &$inputs)
 	{
-		$flags = [];
-
+		$matches = [];
 		foreach ($inputs as $key => $input) {
-			preg_match('/(\-\-[a-z\-]+|\-[a-z])/', $input, $matches);
-			if ($matches) {
-				$flags[] = $matches[1];
+			preg_match('/(\-\-[a-z-_]+|\-[a-z])(\=([a-z\-\.]+))?/', $input, $match);
+			if ($match) {
+				$matches[] = $match;
 				unset($inputs[$key]);
 			}
 		}
 
-		foreach ($flags as $flag) {
-			switch ($flag) {
+		foreach ($matches as $match) {
+			switch ($match[1]) {
 				case '-e':
 				case '--exit-early':
 					$this->exitEarly = true;
@@ -86,15 +78,12 @@ class ConsoleRunner
 
 	/**
 	 * @param  string[]  $inputs
+	 * @param  string[]  $excludes
 	 *
 	 * @return string[]
 	 */
-	private function getPaths(array $inputs)
+	protected function getPaths(array $inputs, array $excludes = [])
 	{
-		$dirs = [];
-		$paths = [];
-		$excludes = [];
-
 		foreach ($inputs as $key => $input) {
 			if (strpos($input, '--exclude=') === 0) {
 				$excludes[] = substr($input, 10);
@@ -102,45 +91,10 @@ class ConsoleRunner
 			}
 		}
 
-		if (!$inputs) {
-			throw new \InvalidArgumentException("No paths given");
-		}
-
-		foreach ($inputs as $input) {
-			if (is_dir($input)) {
-				$dirs[] = $input;
-			} elseif (file_exists($input)) {
-				$paths[] = $input;
-			} else {
-				throw new \InvalidArgumentException("Path does not exist: $input");
-			}
-		}
-
-		if ($dirs) {
-			$finder = Finder::create()
-				->files()
-				->name('*.php')
-				->exclude($excludes)
-				->in($dirs);
-
-			foreach ($finder as $file) {
-				$paths[] = $file->getPathName();
-			}
-		}
-
-		foreach ($paths as $key => $value) {
-			foreach ($excludes as $exclude) {
-				if (strpos($value, $exclude) === 0) {
-					unset($paths[$key]);
-					continue 2;
-				}
-			}
-		}
-
-		return array_unique($paths);
+		return parent::getPaths($inputs, $excludes);
 	}
 
-	private function check($path)
+	protected function check($path)
 	{
 		$checker = $this->makeChecker();
 		$checker->check(realpath($path));
@@ -162,15 +116,5 @@ class ConsoleRunner
 		}
 
 		return ! $this->hasErrors;
-	}
-
-	/**
-	 * @return Checker
-	 */
-	private function makeChecker()
-	{
-		$checker = new Checker;
-		$checker->addDefaultVisitors();
-		return $checker;
 	}
 }
