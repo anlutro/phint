@@ -2,9 +2,12 @@
 namespace Phint\Visitors;
 
 use Phint\AbstractNodeVisitor;
+use Phint\Error;
 use Phint\NodeVisitorInterface;
 use PhpParser\Node;
+use PhpParser\Node\Name;
 use PhpParser\Node\Stmt\Function_;
+use PhpParser\Node\Param;
 use ReflectionFunction;
 
 class FunctionVisitor extends AbstractNodeVisitor implements NodeVisitorInterface
@@ -37,6 +40,11 @@ class FunctionVisitor extends AbstractNodeVisitor implements NodeVisitorInterfac
 		$this->recurse($node->stmts);
 
 		$ctx->setReflectionFunction(null);
+	}
+
+	private function classExists($className)
+	{
+		return class_exists($className) || interface_exists($className);
 	}
 
 	private function createClassNotFoundError($class, Function_ $node,
