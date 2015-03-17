@@ -22,6 +22,18 @@ class AssignVisitor extends AbstractNodeVisitor implements NodeVisitorInterface
 			return;
 		}
 
+		$this->innerCheck($node);
+	}
+
+	/**
+	 * Really check the node.
+	 *
+	 * @param  Assign|AssignRef $node
+	 *
+	 * @return void
+	 */
+	private function innerCheck(Node $node)
+	{
 		$ctx = $this->getContext();
 
 		if ($node->var instanceof PropertyFetch) {
@@ -53,7 +65,6 @@ class AssignVisitor extends AbstractNodeVisitor implements NodeVisitorInterface
 		if ($node->var instanceof Variable) {
 			$ctx->setVariable($node->var->name, $var);
 		}
-
 	}
 
 	private function createUndefinedPropertyError(PropertyFetch $node, ReflectionClass $reflClass)

@@ -320,64 +320,84 @@ class Chain
 
 	private function checkMethodCall(MethodCall $node)
 	{
-		$currentReflClass = $this->getCurrentReflectionClass();
+		$reflClasses = $this->getCurrentReflectionClass();
 
-		if (!$currentReflClass) {
+		if (!$reflClasses) {
 			$this->addMethodOnNonObjectError($node);
 			return false;
 		}
 
-		if (!$currentReflClass->hasMethod($node->name)) {
-			if (!$currentReflClass->hasMethod('__call')) {
-				$class = $currentReflClass->getName();
-				$this->addUndefinedMethodError($node, $class, $node->name);
-			}
-			return false;
+		if (!is_array($reflClasses)) {
+			$reflClasses = [$reflClasses];
 		}
 
-		$reflMethod = $currentReflClass->getMethod($node->name);
-		$type = $this->getReflectionType($reflMethod);
+		$types = [];
 
-		if (!$type) {
-			if (!$this->isLastLink) {
-				$this->addUndeterminableTypeError($node,
-					$currentReflClass->getName());
+		foreach ($reflClasses as $reflClass) {
+			if (!$reflClass->hasMethod($node->name)) {
+				if (!$reflClass->hasMethod('__call')) {
+					$class = $reflClass->getName();
+					$this->addUndefinedMethodError($node, $class, $node->name);
+				}
+				return false;
 			}
-			return false;
+
+			$reflMethod = $reflClass->getMethod($node->name);
+			$type = $this->getReflectionType($reflMethod);
+
+			if (!$type) {
+				if (!$this->isLastLink) {
+					$this->addUndeterminableTypeError($node,
+						$reflClass->getName());
+				}
+				return false;
+			}
+
+			$types = array_merge($types, (array) $type);
 		}
 
-		return $this->updateType($type);
+		return $this->updateType($types);
 	}
 
 	private function checkPropertyFetch(PropertyFetch $node)
 	{
-		$currentReflClass = $this->getCurrentReflectionClass();
+		$reflClasses = $this->getCurrentReflectionClass();
 
-		if (!$currentReflClass) {
+		if (!$reflClasses) {
 			$this->addProperyOfNonObjectError($node);
 			return false;
 		}
 
-		if (!$currentReflClass->hasProperty($node->name)) {
-			if (!$currentReflClass->hasMethod('__get')) {
-				$class = $currentReflClass->getName();
-				$this->addUndefinedPropertyError($node, $class, $node->name);
-			}
-			return false;
+		if (!is_array($reflClasses)) {
+			$reflClasses = [$reflClasses];
 		}
 
-		$reflProperty = $currentReflClass->getProperty($node->name);
-		$type = $this->getReflectionType($reflProperty);
+		$types = [];
 
-		if (!$type) {
-			if (!$this->isLastLink) {
-				$this->addUndeterminableTypeError($node,
-					$currentReflClass->getName());
+		foreach ($reflClasses as $reflClass) {
+			if (!$reflClass->hasProperty($node->name)) {
+				if (!$reflClass->hasMethod('__get')) {
+					$class = $reflClass->getName();
+					$this->addUndefinedPropertyError($node, $class, $node->name);
+				}
+				return false;
 			}
-			return false;
+
+			$reflProperty = $reflClass->getProperty($node->name);
+			$type = $this->getReflectionType($reflProperty);
+
+			if (!$type) {
+				if (!$this->isLastLink) {
+					$this->addUndeterminableTypeError($node,
+						$reflClass->getName());
+				}
+				return false;
+			}
+
+			$types = array_merge($types, (array) $type);
 		}
 
-		return $this->updateType($type);
+		return $this->updateType($types);
 	}
 
 	public function getCurrentType()

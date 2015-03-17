@@ -57,11 +57,7 @@ class ContextWrapper
 		}
 
 		if ($node instanceof \PhpParser\Node\Param) {
-			if ($type = $node->type) {
-				if ($type instanceof \PhpParser\Node\Name) {
-					return $this->getClassName($type);
-				}
-			}
+			$type = null;
 
 			$reflFunc = $this->getReflectionFunction();
 			if ($reflFunc) {
@@ -72,6 +68,12 @@ class ContextWrapper
 				$type = DocblockParser::getParamType($docblock, $node->name);
 				if ($type) {
 					$type = $this->parseDocblockType($type);
+				}
+			}
+
+			if (!$type) {
+				if ($node->type instanceof \PhpParser\Node\Name) {
+					return $this->getClassName($node->type);
 				}
 			}
 
