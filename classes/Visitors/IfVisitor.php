@@ -30,13 +30,17 @@ class IfVisitor extends AbstractNodeVisitor implements NodeVisitorInterface
 
 	public function visitIf(Node $node)
 	{
+		// check for undefined variables, properties, functions, methods etc
 		$this->recurse($node->cond);
+
+		// if the if condition contains instanceof expressions, we can assume
+		// that the variable being checked are of that type inside the if block
+		$ctx = $this->getContext();
 		$instanceofs = $this->findInstanceofs($node->cond);
 		$oldVars = [];
 		$newVars = [];
 
 		if ($instanceofs) {
-			$ctx = $this->getContext();
 			foreach ($instanceofs as $instanceof) {
 				if (
 					$instanceof->expr instanceof Variable &&
@@ -62,6 +66,24 @@ class IfVisitor extends AbstractNodeVisitor implements NodeVisitorInterface
 				$ctx->setVariable($name, $var);
 			}
 		}
+
+		// if the if statement contains a NOT instanceof expression, we can
+		// assume that for the rest of the function/method body, the variable is
+		// in fact of the type the if statement checked NOT for
+		// see https://github.com/anlutro/phint/issues/4
+		$notInstanceofs = $this->findNotInstanceOfs($node->cond);
+
+		foreach ($notInstanceofs as $instanceof) {
+			if (
+				$instanceof->expr instanceof Variable &&
+				$instanceof->class instanceof Name
+			) {
+				$oldVar = $ctx->getVariable($instanceof->expr->name);
+				$newVar = new \Phint\Context\Variable($oldVar->getNode(),
+					$ctx->getClassName($instanceof->class));
+				$ctx->setVariable($instanceof->expr->name, $newVar);
+			}
+		}
 	}
 
 	public function findInstanceofs($cond)
@@ -70,6 +92,20 @@ class IfVisitor extends AbstractNodeVisitor implements NodeVisitorInterface
 
 		if ($cond instanceof Instanceof_) {
 			$instanceofs[] = $cond;
+		}
+
+		return $instanceofs;
+	}
+
+	private function findNotInstanceOfs($cond)
+	{
+		$instanceofs = [];
+
+		if (
+			$cond instanceof \PhpParser\Node\Expr\BooleanNot &&
+			$cond->expr instanceof Instanceof_
+		) {
+			$instanceofs[] = $cond->expr;
 		}
 
 		return $instanceofs;
