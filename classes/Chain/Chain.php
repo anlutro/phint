@@ -128,7 +128,7 @@ class Chain
 			return false;
 		}
 
-		if (! $this->currentReflClass && (
+		if (! $this->context->getReflectionClass() && (
 			$node->class == 'static' ||
 			$node->class == 'self' ||
 			$node->class == 'parent'
