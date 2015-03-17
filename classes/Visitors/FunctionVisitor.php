@@ -38,4 +38,15 @@ class FunctionVisitor extends AbstractNodeVisitor implements NodeVisitorInterfac
 
 		$ctx->setReflectionFunction(null);
 	}
+
+	private function createClassNotFoundError($class, Function_ $node,
+		Param $param, $type)
+	{
+		$class = ltrim($class, '\\');
+		$type = ltrim($type, '\\');
+		$method = $class.'::'.$node->name;
+		$msg = "$method() argument \${$param->name} is type-hinted "
+			. "against a non-existant class: $type";
+		return new Error($msg, $param);
+	}
 }
