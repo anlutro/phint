@@ -6,6 +6,7 @@ class ConsoleRunner extends AbstractRunner
 	protected $cwd;
 	protected $hasErrors = false;
 	protected $exitEarly = false;
+	protected $excludes = [];
 
 	/**
 	 * Run the check.
@@ -51,7 +52,7 @@ class ConsoleRunner extends AbstractRunner
 	{
 		$matches = [];
 		foreach ($inputs as $key => $input) {
-			preg_match('/(\-\-[a-z-_]+|\-[a-z])(\=([a-z\-\.]+))?/', $input, $match);
+			preg_match('/(--[a-z-_]+|-[a-z])(=([a-zA-Z-._\/\\\\]+))?/', $input, $match);
 			if ($match) {
 				$matches[] = $match;
 				unset($inputs[$key]);
@@ -60,6 +61,9 @@ class ConsoleRunner extends AbstractRunner
 
 		foreach ($matches as $match) {
 			switch ($match[1]) {
+				case '--exclude':
+					$this->excludes[] = $match[3];
+					break;
 				case '-e':
 				case '--exit-early':
 					$this->exitEarly = true;
@@ -89,12 +93,7 @@ class ConsoleRunner extends AbstractRunner
 	 */
 	protected function getPaths(array $inputs, array $excludes = [])
 	{
-		foreach ($inputs as $key => $input) {
-			if (strpos($input, '--exclude=') === 0) {
-				$excludes[] = substr($input, 10);
-				unset($inputs[$key]);
-			}
-		}
+		$excludes = array_merge($this->excludes, $excludes);
 
 		return parent::getPaths($inputs, $excludes);
 	}
