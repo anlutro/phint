@@ -295,6 +295,11 @@ class Chain
 	{
 		$this->currentLink = $link;
 
+		if ($link instanceof \PhpParser\Node\Expr\ArrayDimFetch) {
+			// TODO
+			return true;
+		}
+
 		if ($link->name instanceof \PhpParser\Node\Expr) {
 			$this->updateType(['mixed']);
 			return true;
