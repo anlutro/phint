@@ -94,7 +94,7 @@ class ContextWrapper
 		}
 
 		if (
-			$node instanceof \PhpParser\Node\Scalar\String ||
+			$node instanceof \PhpParser\Node\Scalar\String_ ||
 			$node instanceof \PhpParser\Node\Scalar\Encapsed
 		) {
 			return 'string';
