@@ -54,8 +54,10 @@ class NodeTraverser
 	 */
 	public function traverse(array $nodes)
 	{
+		$visitors = $this->visitors->getAll();
+
 		foreach ($nodes as $node) {
-			foreach ($this->visitors->getAll() as $visitor) {
+			foreach ($visitors as $visitor) {
 				$visitor->visit($node);
 			}
 		}
