@@ -20,7 +20,7 @@
 	},
 	"bin": ["bin/phint"],
 	"require": {
-		"nikic/php-parser": "~1.1",
+		"nikic/php-parser": "~1.2",
 		"symfony/finder": "~2.6"
 	}
 }
