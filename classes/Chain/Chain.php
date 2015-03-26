@@ -87,6 +87,8 @@ class Chain
 			$visitor = $this->getVisitor('StaticMethodCallVisitor');
 		} elseif ($node instanceof FuncCall) {
 			$visitor = $this->getVisitor('FunctionCallVisitor');
+		} elseif ($node instanceof \PhpParser\Node\Expr\New_) {
+			$visitor = $this->getVisitor('NewVisitor');
 		}
 
 		if (isset($visitor)) {
@@ -100,6 +102,15 @@ class Chain
 			$type = $ctxVar->getType();
 			if (!$type) {
 				$this->addUndeterminableVariableTypeError($node);
+				return false;
+			}
+			$type = (array) $type;
+		} elseif ($node instanceof \PhpParser\Node\Expr\New_) {
+			if (!$node->class instanceof \PhpParser\Node\Name) {
+				return false;
+			}
+			$type = $this->context->getClassName($node->class);
+			if (!$type) {
 				return false;
 			}
 			$type = (array) $type;
