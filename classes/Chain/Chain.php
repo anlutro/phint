@@ -359,6 +359,44 @@ class Chain
 			}
 
 			$reflMethod = $reflClass->getMethod($node->name);
+
+			$params = $reflMethod->getParameters();
+
+			// verify number of arguments
+			if (count($node->args) > count($params)) {
+				// cannot error on this as php functions can use func_get_args()
+			}
+
+			$requiredParams = 0;
+			foreach ($params as $param) {
+				if ($param->isOptional() || $param->isDefaultValueAvailable()) {
+					break;
+				}
+				$requiredParams++;
+			}
+			if (count($node->args) < $requiredParams) {
+				$this->addNotEnoughParamsError($node,
+					$reflClass, $requiredParams);
+			}
+
+			// look for function parameters passed by reference
+			foreach ($params as $param) {
+				if ($param->isPassedByReference()) {
+					$pos = $param->getPosition();
+					if (isset($node->args[$pos])) {
+						$var = $node->args[$pos]->value;
+						if ($var instanceof Variable) {
+							$this->context->setVariable($var->name, $var);
+						}
+					}
+				}
+			}
+
+			$argValues = array_map(function($arg) {
+				return $arg->value;
+			}, $node->args);
+			$this->recurse($argValues);
+
 			$type = $this->getReflectionType($reflMethod);
 
 			if (!$type) {
@@ -429,6 +467,17 @@ class Chain
 	{
 		return count($this->currentReflClass) > 1 || !$this->currentReflClass
 			? $this->currentReflClass : $this->currentReflClass[0];
+	}
+
+	protected function recurse(array $nodes)
+	{
+		$visitors = $this->visitors->getAll();
+
+		foreach ($nodes as $node) {
+			foreach ($visitors as $visitor) {
+				$visitor->visit($node);
+			}
+		}
 	}
 
 	private function addMethodOnNonObjectError(MethodCall $node)
@@ -512,6 +561,13 @@ class Chain
 			}
 		}
 		$msg = "Cannot determine $typeName of $nodeString";
+		$this->errors->add(new Error($msg, $node));
+	}
+
+	private function addNotEnoughParamsError(MethodCall $node, ReflectionClass $reflClass, $requiredParams)
+	{
+		$numArgs = count($node->args);
+		$msg = "Method {$reflClass->getName()}::{$node->name}() requires $requiredParams arguments, $numArgs given";
 		$this->errors->add(new Error($msg, $node));
 	}
 }
