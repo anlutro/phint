@@ -85,7 +85,6 @@ class Checker
 		$this->addVisitor('Phint\Visitors\StringWithVariableVisitor');
 		$this->addVisitor('Phint\Visitors\NewVisitor');
 		$this->addVisitor('Phint\Visitors\FunctionCallVisitor');
-		$this->addVisitor('Phint\Visitors\MethodCallVisitor');
 		$this->addVisitor('Phint\Visitors\ReturnVisitor');
 		$this->addVisitor('Phint\Visitors\IfVisitor');
 		$this->addVisitor('Phint\Visitors\WhileVisitor');
@@ -97,6 +96,8 @@ class Checker
 
 		// these visitors should be considered to be made optional
 		$this->addVisitor('Phint\Visitors\ChainVisitor', [$this->makeChainFactory()]);
+		// chainvisitor replaces the following:
+		// $this->addVisitor('Phint\Visitors\MethodCallVisitor');
 	}
 
 	public function check($path)
