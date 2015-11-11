@@ -44,11 +44,6 @@ class ClassMethodVisitor extends AbstractNodeVisitor implements NodeVisitorInter
 		$ctx->setReflectionFunction(null);
 	}
 
-	private function classExists($className)
-	{
-		return class_exists($className) || interface_exists($className);
-	}
-
 	private function createClassNotFoundError($class, ClassMethod $node,
 		Param $param, $type)
 	{

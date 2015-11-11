@@ -42,11 +42,6 @@ class FunctionVisitor extends AbstractNodeVisitor implements NodeVisitorInterfac
 		$ctx->setReflectionFunction(null);
 	}
 
-	private function classExists($className)
-	{
-		return class_exists($className) || interface_exists($className);
-	}
-
 	private function createClassNotFoundError($class, Function_ $node,
 		Param $param, $type)
 	{

@@ -48,11 +48,6 @@ class TryCatchVisitor extends AbstractNodeVisitor implements NodeVisitorInterfac
 		}
 	}
 
-	private function classExists($className)
-	{
-		return class_exists($className) || interface_exists($className);
-	}
-
 	private function createClassNotFoundError($className, Node $node)
 	{
 		$className = ltrim($className, '\\');

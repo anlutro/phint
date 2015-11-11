@@ -34,11 +34,6 @@ class InstanceofVisitor extends AbstractNodeVisitor implements NodeVisitorInterf
 		}
 	}
 
-	private function classExists($className)
-	{
-		return class_exists($className) || interface_exists($className);
-	}
-
 	private function createClassNotFoundError($className, Instanceof_ $node)
 	{
 		$className = ltrim($className, '\\');

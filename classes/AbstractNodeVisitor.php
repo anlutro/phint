@@ -94,4 +94,9 @@ abstract class AbstractNodeVisitor
 			return $visitor->visit($node);
 		}
 	}
+
+	protected function classExists($className)
+	{
+		return class_exists($className) || interface_exists($className);
+	}
 }
