@@ -107,14 +107,14 @@ class ConsoleRunner extends AbstractRunner
 			if ($this->hasErrors) {
 				echo "\n";
 			}
-			echo "Errors in $path:\n";
+			echo "\e[33mErrors in $path:\e[0m\n";
 			$longestLine = 0;
 			foreach ($errors as $error) {
 				$longestLine = strlen($error->getLineNumber());
 			}
 			foreach ($errors as $error) {
 				$line = str_pad('L'.$error->getLineNumber(), $longestLine + 3);
-				echo $line.$error->getMessage()."\n";
+				echo "\e[31m".$line."\e[0m".$error->getMessage()."\n";
 			}
 			$this->hasErrors = true;
 		}
