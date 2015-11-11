@@ -85,6 +85,7 @@ class Checker
 		$this->addVisitor('Phint\Visitors\StringWithVariableVisitor');
 		$this->addVisitor('Phint\Visitors\NewVisitor');
 		$this->addVisitor('Phint\Visitors\FunctionCallVisitor');
+		$this->addVisitor('Phint\Visitors\MethodCallVisitor');
 		$this->addVisitor('Phint\Visitors\ReturnVisitor');
 		$this->addVisitor('Phint\Visitors\IfVisitor');
 		$this->addVisitor('Phint\Visitors\WhileVisitor');

@@ -18,7 +18,6 @@ class ClassMethodVisitor extends AbstractNodeVisitor implements NodeVisitorInter
 		}
 
 		$ctx = $this->getContext();
-
 		$ctx->resetVariables();
 		$ctx->setFunctionNode($node);
 		$reflClass = $ctx->getReflectionClass();
