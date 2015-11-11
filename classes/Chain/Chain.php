@@ -336,6 +336,10 @@ class Chain
 
 	private function checkMethodCall(MethodCall $node)
 	{
+		$this->recurse(array_map(function($arg) {
+			return $arg->value;
+		}, $node->args));
+
 		$reflClasses = $this->getCurrentReflectionClass();
 
 		if (!$reflClasses) {
@@ -391,11 +395,6 @@ class Chain
 					}
 				}
 			}
-
-			$argValues = array_map(function($arg) {
-				return $arg->value;
-			}, $node->args);
-			$this->recurse($argValues);
 
 			$type = $this->getReflectionType($reflMethod);
 
