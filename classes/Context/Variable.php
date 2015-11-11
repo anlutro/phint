@@ -26,7 +26,7 @@ class Variable
 
 	protected static $nonClassTypes = ['mixed', 'void',
 		'null', 'string', 'int', 'integer', 'float', 'double', 'bool', 'boolean',
-		'array', 'object', 'resource'];
+		'array', 'object', 'resource', 'callable'];
 
 	/**
 	 * Determine if a type is a class type.
