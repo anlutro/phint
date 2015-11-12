@@ -55,11 +55,16 @@ abstract class AbstractRunner
 		if ($dirs) {
 			$finder = Finder::create()
 				->files()
+				->in($dirs)
 				->name('*.php')
-				->exclude($excludes)
-				->in($dirs);
+				->exclude($excludes);
 
 			foreach ($finder as $file) {
+				// finder doesn't let you exclude files, only directories
+				if (in_array($file->getRelativePathName(), $excludes, true)) {
+					continue;
+				}
+
 				$paths[] = $file->getPathName();
 			}
 		}
