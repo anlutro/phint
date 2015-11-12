@@ -83,7 +83,7 @@ class ContextWrapper
 				$hintType = $this->getClassName($node->type);
 			}
 
-			if ($hintType && $docblockType && $hintType != $docblockType) {
+			if ($hintType && $docblockType && !in_array($hintType, $docblockType)) {
 				$msg = "@param docblock and type-hint mismatch for argument \${$node->name}";
 				$this->addError(new Error($msg, $node));
 			}
