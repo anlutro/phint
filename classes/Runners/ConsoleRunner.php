@@ -117,6 +117,7 @@ class ConsoleRunner extends AbstractRunner
 	{
 		$checker = $this->makeChecker();
 		$checker->check(realpath($path));
+		$printedErrors = [];
 
 		if ($errors = $checker->getErrors()) {
 			$this->numFilesWithErrors++;
@@ -126,12 +127,20 @@ class ConsoleRunner extends AbstractRunner
 			echo "\e[33mErrors in $path:\e[0m\n";
 			$longestLine = 0;
 			foreach ($errors as $error) {
-				$longestLine = strlen($error->getLineNumber());
+				$strlen = strlen($error->getLineNumber());
+				if ($strlen > $longestLine) {
+					$longestLine = $strlen;
+				}
 			}
 			foreach ($errors as $error) {
-				$this->numErrors++;
 				$line = str_pad('L'.$error->getLineNumber(), $longestLine + 3);
-				echo "\e[31m".$line."\e[0m".$error->getMessage()."\n";
+				$out = "\e[31m".$line."\e[0m".$error->getMessage()."\n";
+				if (in_array($out, $printedErrors, true)) {
+					continue;
+				}
+				$this->numErrors++;
+				echo $out;
+				$printedErrors[] = $out;
 			}
 			$this->hasErrors = true;
 		}
