@@ -493,6 +493,8 @@ class Chain
 			$nodeName = 'Method '.$className.'::'.$node->name.'()';
 		} elseif ($node instanceof PropertyFetch) {
 			$nodeName = 'Property '.$className.'::$'.$node->name;
+		} elseif ($node instanceof Variable) {
+			$nodeName = 'Variable $'.$node->name;
 		} else {
 			if (PHINT_DEBUG) {
 				var_dump(__METHOD__.':'.__LINE__);
