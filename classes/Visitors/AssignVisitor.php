@@ -86,9 +86,13 @@ class AssignVisitor extends AbstractNodeVisitor implements NodeVisitorInterface
 		if ($node->expr instanceof New_) {
 			$className = $this->getContext()->getClassName($node->expr->class);
 
-			if ($className && !class_exists($className)) {
+			if (!$className) {
+				return null;
+			}
+
+			if (!class_exists($className)) {
 				$this->addError($this->createClassNotFoundError($className, $node->expr));
-				return false;
+				return null;
 			}
 
 			return new ReflectionClass($className);
