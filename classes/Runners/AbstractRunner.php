@@ -44,7 +44,7 @@ abstract class AbstractRunner
 
 		foreach ($inputs as $input) {
 			if (is_dir($input)) {
-				$dirs[] = $input;
+				$dirs[] = rtrim($input, '/\\');
 			} elseif (file_exists($input)) {
 				$paths[] = $input;
 			} else {
