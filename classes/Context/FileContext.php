@@ -63,6 +63,12 @@ class FileContext
 				$className = ($this->namespace ? $this->namespace.'\\' : '').$node->name;
 				$this->reflectionClass = new ReflectionClass($className);
 			}
+
+			if ($node instanceof \PhpParser\Node\Stmt\Interface_) {
+				$this->classNode = $node;
+				$className = ($this->namespace ? $this->namespace.'\\' : '').$node->name;
+				$this->reflectionClass = new ReflectionClass($className);
+			}
 		}
 	}
 
