@@ -53,3 +53,5 @@ $stub .= "\n__HALT_COMPILER();\n";
 
 $phar->setStub($stub);
 $phar->stopBuffering();
+
+chmod('phint.phar', 0755);
