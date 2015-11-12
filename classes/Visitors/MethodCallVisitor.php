@@ -27,7 +27,38 @@ class MethodCallVisitor extends AbstractNodeVisitor implements NodeVisitorInterf
 		}
 
 		if (isset($reflMethod)) {
-			$this->checkParams($reflMethod, $node);
+			$params = $reflMethod->getParameters();
+
+			// verify number of arguments
+			if (count($node->args) > count($params)) {
+				// cannot error on this as php functions can use func_get_args()
+			}
+
+			$requiredParams = 0;
+			foreach ($params as $param) {
+				if ($param->isOptional() || $param->isDefaultValueAvailable()) {
+					break;
+				}
+				$requiredParams++;
+			}
+			if (count($node->args) < $requiredParams) {
+				$this->addError($this->createNotEnoughParamsError($node,
+					$reflClass, $requiredParams));
+			}
+
+			// look for function parameters passed by reference
+			foreach ($params as $param) {
+				if ($param->isPassedByReference()) {
+					$pos = $param->getPosition();
+					if (isset($node->args[$pos])) {
+						$var = $node->args[$pos]->value;
+						if ($var instanceof Variable) {
+							$this->getContext()
+								->setVariable($var->name, $var);
+						}
+					}
+				}
+			}
 		}
 
 		// recurse over the values of each argument
@@ -65,42 +96,6 @@ class MethodCallVisitor extends AbstractNodeVisitor implements NodeVisitorInterf
 		} else {
 			$this->addError($this->createUndefinedMethodError(
 				$node, $reflClass));
-		}
-	}
-
-	private function checkParams(ReflectionMethod $reflMethod, MethodCall $node)
-	{
-		$params = $reflMethod->getParameters();
-
-		// verify number of arguments
-		if (count($node->args) > count($params)) {
-			// cannot error on this as php functions can use func_get_args()
-		}
-
-		$requiredParams = 0;
-		foreach ($params as $param) {
-			if ($param->isOptional() || $param->isDefaultValueAvailable()) {
-				break;
-			}
-			$requiredParams++;
-		}
-		if (count($node->args) < $requiredParams) {
-			$this->addError($this->createNotEnoughParamsError($node,
-				$reflClass, $requiredParams));
-		}
-
-		// look for function parameters passed by reference
-		foreach ($params as $param) {
-			if ($param->isPassedByReference()) {
-				$pos = $param->getPosition();
-				if (isset($node->args[$pos])) {
-					$var = $node->args[$pos]->value;
-					if ($var instanceof Variable) {
-						$this->getContext()
-							->setVariable($var->name, $var);
-					}
-				}
-			}
 		}
 	}
 
