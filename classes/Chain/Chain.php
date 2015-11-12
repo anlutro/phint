@@ -563,7 +563,7 @@ class Chain
 
 	private function addPropertyOfNonObjectError(PropertyFetch $node)
 	{
-		$msg = "Trying to get property of non-object";
+		$msg = "Trying to get property \${$node->name} of non-object";
 		$this->errors->add(new Error($msg, $node));
 	}
 
