@@ -36,7 +36,7 @@ Note that you **must** be in your project's root for Phint to run. You also need
 
 Example output from a simple command run:
 
-![http://i.imgur.com/etkn1g2.png]()
+![](http://i.imgur.com/etkn1g2.png)
 
 You can pass `--strict` or `-s` as an arugment to get more errors. The errors marked as strict are more prone to be wrong, but should be more accurate as time goes on.
 
