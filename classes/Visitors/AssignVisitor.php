@@ -2,6 +2,7 @@
 namespace Phint\Visitors;
 
 use Phint\AbstractNodeVisitor;
+use Phint\DocblockParser;
 use Phint\Error;
 use Phint\NodeVisitorInterface;
 use ReflectionClass;
@@ -13,6 +14,7 @@ use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\StaticCall;
 use PhpParser\Node\Expr\PropertyFetch;
 use PhpParser\Node\Expr\List_;
+use PhpParser\Node\Expr\New_;
 
 class AssignVisitor extends AbstractNodeVisitor implements NodeVisitorInterface
 {
@@ -50,6 +52,7 @@ class AssignVisitor extends AbstractNodeVisitor implements NodeVisitorInterface
 			}
 		}
 
+
 		if (
 			$node->expr instanceof MethodCall ||
 			$node->expr instanceof StaticCall ||
@@ -58,13 +61,45 @@ class AssignVisitor extends AbstractNodeVisitor implements NodeVisitorInterface
 			$type = $this->traverseVariableChain($node->expr);
 			$var = new \Phint\Context\Variable($node->expr, $type);
 		} else {
+			$type = $this->getType($node);
+			$var = new \Phint\Context\Variable($node->expr, $type);
 			$this->recurse($node->expr);
-			$var = $node->expr;
 		}
 
 		if ($node->var instanceof Variable) {
 			$ctx->setVariable($node->var->name, $var);
 		}
+	}
+
+	private function getType($node)
+	{
+		$type = null;
+
+		if ($node->hasAttribute('comments')) {
+			foreach ($node->getAttribute('comments') as $comment) {
+				$type = DocblockParser::getVariableType($comment->getText());
+			}
+		}
+
+		if ($type) return $type;
+
+		if ($node->expr instanceof New_) {
+			$className = $this->getContext()->getClassName($node->expr->class);
+
+			if ($className && !class_exists($className)) {
+				$this->addError($this->createClassNotFoundError($className, $node->expr));
+				return false;
+			}
+
+			return new ReflectionClass($className);
+		}
+	}
+
+	private function createClassNotFoundError($className, New_ $node)
+	{
+		$className = ltrim($className, '\\');
+		$msg = "Tried instantiating non-existant class: $className";
+		return new Error($msg, $node);
 	}
 
 	private function createUndefinedPropertyError(PropertyFetch $node, ReflectionClass $reflClass)
