@@ -41,8 +41,8 @@ class Checker
 		NodeTraverser $traverser = null
 	) {
 		$this->parser = $parser ?: $this->makeParser();
-		$this->context = $context ?: new ContextWrapper();
 		$this->errors = $errors ?: new ErrorBag();
+		$this->context = $context ?: new ContextWrapper(null, null, $this->errors);
 		$this->traverser = $traverser ?: new NodeTraverser();
 	}
 

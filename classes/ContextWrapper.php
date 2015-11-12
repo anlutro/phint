@@ -6,21 +6,29 @@ use ReflectionClass;
 use Phint\Context\FileContext;
 use Phint\Context\FunctionContext;
 use Phint\Context\Variable;
+use Phint\Error;
+use Phint\ErrorBag;
 use PhpParser\Node;
 
 class ContextWrapper
 {
 	/** @var FileContext */
 	protected $fileContext;
+
 	/** @var FunctionContext */
 	protected $funcContext;
 
+	/** @var ErrorBag */
+	private $errors;
+
 	public function __construct(
 		FileContext $fileContext = null,
-		FunctionContext $funcContext = null
+		FunctionContext $funcContext = null,
+		ErrorBag $errors = null
 	) {
 		$this->fileContext = $fileContext ?: new FileContext();
 		$this->funcContext = $funcContext ?: new FunctionContext();
+		$this->errors = $errors;
 	}
 
 	public function getFunctionContext()
@@ -57,7 +65,7 @@ class ContextWrapper
 		}
 
 		if ($node instanceof \PhpParser\Node\Param) {
-			$type = null;
+			$docblockType = $hintType = null;
 
 			$reflFunc = $this->getReflectionFunction();
 			if ($reflFunc) {
@@ -65,19 +73,22 @@ class ContextWrapper
 			}
 
 			if (isset($docblock) && $docblock) {
-				$type = DocblockParser::getParamType($docblock, $node->name);
-				if ($type) {
-					$type = $this->parseDocblockType($type);
+				$docblockType = DocblockParser::getParamType($docblock, $node->name);
+				if ($docblockType) {
+					$docblockType = $this->parseDocblockType($docblockType);
 				}
 			}
 
-			if (!$type) {
-				if ($node->type instanceof \PhpParser\Node\Name) {
-					return $this->getClassName($node->type);
-				}
+			if ($node->type instanceof \PhpParser\Node\Name) {
+				$hintType = $this->getClassName($node->type);
 			}
 
-			return $type;
+			if ($hintType && $docblockType && $hintType != $docblockType) {
+				$msg = "@param docblock and type-hint mismatch for argument \${$node->name}";
+				$this->addError(new Error($msg, $node));
+			}
+
+			return $hintType ?: $docblockType;
 		}
 
 		if ($node instanceof \PhpParser\Node\Expr\New_) {
@@ -213,5 +224,10 @@ class ContextWrapper
 	public function setFileName($filename)
 	{
 		$this->fileContext->setFileName($filename);
+	}
+
+	private function addError(Error $error)
+	{
+		if ($this->errors) $this->errors->add($error);
 	}
 }
