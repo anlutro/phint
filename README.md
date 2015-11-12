@@ -20,7 +20,7 @@ More features to come. Check the Github issues.
 
 On a per-project basis:
 
-	composer require anlutro/phint
+	composer require --dev anlutro/phint:dev-master@dev
 	./vendor/bin/phint /path/to/src
 
 Globally:
