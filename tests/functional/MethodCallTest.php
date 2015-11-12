@@ -5,7 +5,6 @@ class MethodCallTest extends FunctionalTestCase
 	public function generated_test()
 	{
 		$errors = $this->check(__DIR__.'/cases/MethodCallCase.php');
-		// var_dump($errors);
 		$this->assertEquals(2, count($errors));
 		$this->assertEquals('6', $errors[0]->getLineNumber());
 		$this->assertEquals('Call to undefined method: MethodCallCase::nope()', $errors[0]->getMessage());
