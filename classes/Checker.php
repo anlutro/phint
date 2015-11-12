@@ -2,7 +2,6 @@
 namespace Phint;
 
 use PhpParser\Parser;
-use PhpParser\Lexer;
 use Phint\Chain\ChainFactory;
 
 class Checker
@@ -41,10 +40,20 @@ class Checker
 		ErrorBag $errors = null,
 		NodeTraverser $traverser = null
 	) {
-		$this->parser = $parser ?: new Parser(new Lexer);
+		$this->parser = $parser ?: $this->makeParser();
 		$this->context = $context ?: new ContextWrapper();
 		$this->errors = $errors ?: new ErrorBag();
 		$this->traverser = $traverser ?: new NodeTraverser();
+	}
+
+	private function makeParser()
+	{
+		if (class_exists('PhpParser\ParserFactory')) {
+			return (new \PhpParser\ParserFactory)
+				->create(\PhpParser\ParserFactory::PREFER_PHP7);
+		}
+
+		return new Parser(new \PhpParser\Lexer);
 	}
 
 	public function makeChainFactory()
