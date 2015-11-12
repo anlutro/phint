@@ -11,6 +11,7 @@ use PhpParser\Node;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\PropertyFetch;
+use PhpParser\Node\Expr\StaticPropertyFetch;
 use PhpParser\Node\Expr\StaticCall;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Parser;
@@ -320,6 +321,8 @@ class Chain
 			return $this->checkMethodCall($link);
 		} elseif ($link instanceof PropertyFetch) {
 			return $this->checkPropertyFetch($link);
+		} elseif ($link instanceof StaticPropertyFetch) {
+			return $this->checkStaticPropertyFetch($link);
 		} elseif ($link instanceof StaticCall) {
 			return $this->getStaticMethodCallType($link);
 		} else {
@@ -417,7 +420,7 @@ class Chain
 		$reflClasses = $this->getCurrentReflectionClass();
 
 		if (!$reflClasses) {
-			$this->addProperyOfNonObjectError($node);
+			$this->addPropertyOfNonObjectError($node);
 			return false;
 		}
 
@@ -437,6 +440,45 @@ class Chain
 			}
 
 			$reflProperty = $reflClass->getProperty($node->name);
+			$type = $this->getReflectionType($reflProperty);
+
+			if (!$type) {
+				if (!$this->isLastLink) {
+					$this->addUndeterminableTypeError($node,
+						$reflClass->getName());
+				}
+				return false;
+			}
+
+			$types = array_merge($types, (array) $type);
+		}
+
+		return $this->updateType($types);
+	}
+
+	private function checkStaticPropertyFetch(StaticPropertyFetch $node)
+	{
+		$reflClasses = $this->getCurrentReflectionClass();
+
+		if (!$reflClasses) {
+			$this->addStaticPropertyOfNonexistantClass($node);
+			return false;
+		}
+
+		if (!is_array($reflClasses)) {
+			$reflClasses = [$reflClasses];
+		}
+
+		$types = [];
+
+		foreach ($reflClasses as $reflClass) {
+			if (!$reflClass->hasStaticProperty($node->name)) {
+				$class = $reflClass->getName();
+				$this->addUndefinedStaticPropertyError($node, $class, $node->name);
+				return false;
+			}
+
+			$reflProperty = $reflClass->getStaticProperty($node->name);
 			$type = $this->getReflectionType($reflProperty);
 
 			if (!$type) {
@@ -481,7 +523,7 @@ class Chain
 
 	private function addMethodOnNonObjectError(MethodCall $node)
 	{
-		$msg = "Trying to call method on non-object";
+		$msg = "Trying to call method {$node->name} on non-object";
 		$this->errors->add(new Error($msg, $node));
 	}
 
@@ -519,7 +561,7 @@ class Chain
 		$this->errors->add(new Error($msg, $node));
 	}
 
-	private function addProperyOfNonObjectError(PropertyFetch $node)
+	private function addPropertyOfNonObjectError(PropertyFetch $node)
 	{
 		$msg = "Trying to get property of non-object";
 		$this->errors->add(new Error($msg, $node));
@@ -528,6 +570,18 @@ class Chain
 	private function addUndefinedPropertyError(PropertyFetch $node, $class, $property)
 	{
 		$msg = "Undefined property: $class::\$$property";
+		$this->errors->add(new Error($msg, $node));
+	}
+
+	private function addStaticPropertyOfNonexistantClass(StaticPropertyFetch $node)
+	{
+		$msg = "Trying to get static property of non-existant class";
+		$this->errors->add(new Error($msg, $node));
+	}
+
+	private function addUndefinedStaticPropertyError(StaticPropertyFetch $node, $class, $property)
+	{
+		$msg = "Undefined static property: $class::\$$property";
 		$this->errors->add(new Error($msg, $node));
 	}
 
