@@ -5,6 +5,8 @@ class ConsoleRunner extends AbstractRunner
 {
 	protected $cwd;
 	protected $hasErrors = false;
+	protected $numErrors = 0;
+	protected $numFilesWithErrors = 0;
 	protected $exitEarly = false;
 	protected $excludes = [];
 
@@ -39,6 +41,19 @@ class ConsoleRunner extends AbstractRunner
 				break;
 			}
 		}
+
+		if ($this->hasErrors) {
+			echo "\n";
+		}
+
+		echo "Successfully scanned ".count($paths)." files\n";
+		if ($this->hasErrors) {
+			echo "\e[1;41m {$this->numErrors} errors found in {$this->numFilesWithErrors} files! \e[0m\n";
+		} else {
+			echo "\e[1;42m No errors found! \e[0m\n";
+		}
+
+		return $this->hasErrors ? 1 : 0;
 
 		if ($this->hasErrors) {
 			return 1;
@@ -104,6 +119,7 @@ class ConsoleRunner extends AbstractRunner
 		$checker->check(realpath($path));
 
 		if ($errors = $checker->getErrors()) {
+			$this->numFilesWithErrors++;
 			if ($this->hasErrors) {
 				echo "\n";
 			}
@@ -113,6 +129,7 @@ class ConsoleRunner extends AbstractRunner
 				$longestLine = strlen($error->getLineNumber());
 			}
 			foreach ($errors as $error) {
+				$this->numErrors++;
 				$line = str_pad('L'.$error->getLineNumber(), $longestLine + 3);
 				echo "\e[31m".$line."\e[0m".$error->getMessage()."\n";
 			}
