@@ -345,7 +345,7 @@ class Chain
 
 		$reflClasses = $this->getCurrentReflectionClass();
 
-		if (!$reflClasses) {
+		if (!$reflClasses && $this->getCurrentType() !== 'mixed' && $this->getCurrentType() !== 'object') {
 			$this->addMethodOnNonObjectError($node);
 			return false;
 		}
