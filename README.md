@@ -25,7 +25,7 @@ On a per-project basis:
 
 Globally:
 
-	wget http://lutro.me/phint.phar
+	wget https://files.lutro.me/phint.phar
 	chmod +x phint.phar
 	sudo mv phint.phar /usr/local/bin
 	phint /path/to/src
